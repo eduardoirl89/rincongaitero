@@ -1,18 +1,23 @@
+
 const CONFIG = {
     nombrePrograma: "RINCÓN GAITERO",
     conductor: "con Eduardo Rincon",
     
-    // Horario dinámico del programa:
-    diaPrograma: 0,         // 0 = Domingo, 1 = Lunes, 2 = Martes, 3 = Miércoles, etc.
-    horaInicio: "4 pm",     // Hora en que inicia
-    horaFin: "6 pm",        // Hora en que termina
+    // Configuración del Horario del Programa En Vivo:
+    diaPrograma: 0,         // 0 = Domingo, 1 = Lunes, 2 = Martes, etc.
+    horaInicio: 16,         // Hora militar de inicio (Ej: 16 para las 4:00 PM)
+    horaFin: 18,            // Hora militar de fin (Ej: 18 para las 6:00 PM)
+    
+    // Textos visibles del horario
+    textoHoraInicio: "4 pm",
+    textoHoraFin: "6 pm",
 
     nombreEmisora: "ONDA 103.5 FM",
     sloganEmisora: "La Super Estación",
     
-    // Configuración de la Web Oficial y su texto visible:
+    // Web Oficial y su texto visible:
     urlWebEmisora: "https://www.ondaciudadbolivar.com",
-    textoWeb: "WWW.ONDACIUDADBOLIVAR.COM", // <-- Aquí escribes el texto exacto que se mostrará en el botón
+    textoWeb: "WWW.ONDACIUDADBOLIVAR.COM", 
 
     urlStreamRadio: "https://acp4.lorini.net:50010/stream",
     whatsappNumero: "584148920921",

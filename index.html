@@ -119,7 +119,7 @@
             backdrop-filter: blur(8px);
             width: 82%;
             max-width: 330px;
-            height: 44px;
+            height: 42px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -130,6 +130,13 @@
             animation: softGlow 3s infinite alternate;
             box-sizing: border-box;
             text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .unified-ellipse:hover {
+            background: rgba(255, 0, 85, 0.3);
+            transform: scale(1.02);
         }
 
         @keyframes softGlow {
@@ -140,7 +147,7 @@
         .ellipse-text {
             color: #fff;
             font-weight: 900;
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             letter-spacing: 1px;
             text-shadow: 0 2px 4px rgba(0,0,0,0.5);
             text-transform: uppercase;
@@ -149,7 +156,7 @@
         /* 1. Cabecera */
         .header-container-relative {
             position: absolute;
-            top: 8%;
+            top: 6%;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
@@ -170,10 +177,10 @@
 
         .cuatro-inline {
             position: absolute;
-            left: 15px;
-            top: -25px;
-            width: 85px;
-            height: 85px;
+            left: 10px;
+            top: -22px;
+            width: 75px;
+            height: 75px;
             object-fit: contain;
             opacity: 0.85;
             filter: drop-shadow(0 4px 10px rgba(0,0,0,0.8));
@@ -193,7 +200,7 @@
             left: 50%;
             transform: translateX(-50%);
             font-family: 'Great Vibes', cursive;
-            font-size: 1.15rem;
+            font-size: 1.05rem;
             color: #ffffff;
             font-weight: 400;
             text-shadow: 0 2px 5px rgba(0,0,0,0.9), 0 0 8px rgba(255,0,85,0.5);
@@ -209,7 +216,7 @@
             left: 50%;
             transform: translateX(-50%);
             font-family: 'Great Vibes', cursive;
-            font-size: 2.2rem;
+            font-size: 2.05rem;
             color: #ffffff;
             font-weight: 400;
             text-shadow: 0 2px 6px rgba(0,0,0,0.9), 0 0 10px rgba(255,0,85,0.6);
@@ -222,7 +229,7 @@
         /* 2. Círculo Central */
         .center-stage {
             position: absolute;
-            top: 40%;
+            top: 37%;
             left: 50%;
             transform: translate(-50%, -50%);
             display: flex;
@@ -234,12 +241,12 @@
 
         .video-circle-container {
             position: relative;
-            width: 240px;
-            height: 240px;
+            width: 210px;
+            height: 210px;
             border-radius: 50%;
-            padding: 5px;
+            padding: 4px;
             background: linear-gradient(135deg, rgba(255,0,85,0.8), rgba(160,32,240,0.8));
-            box-shadow: 0 0 35px rgba(255, 0, 85, 0.5);
+            box-shadow: 0 0 30px rgba(255, 0, 85, 0.5);
             animation: borderPulse 3s infinite alternate;
             transition: transform 0.2s ease;
         }
@@ -250,7 +257,7 @@
 
         @keyframes borderPulse {
             0% { box-shadow: 0 0 20px rgba(255, 0, 85, 0.4); transform: scale(0.98); }
-            100% { box-shadow: 0 0 45px rgba(160, 32, 240, 0.8); transform: scale(1.02); }
+            100% { box-shadow: 0 0 40px rgba(160, 32, 240, 0.8); transform: scale(1.02); }
         }
 
         .video-circle {
@@ -279,16 +286,16 @@
 
         .play-indicator {
             position: absolute;
-            bottom: 10px;
+            bottom: 8px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.75);
+            background: rgba(0, 0, 0, 0.8);
             color: #fff;
-            padding: 4px 12px;
+            padding: 3px 10px;
             border-radius: 20px;
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             font-weight: 700;
-            letter-spacing: 1px;
+            letter-spacing: 0.8px;
             border: 1px solid rgba(255,0,85,0.6);
             display: flex;
             align-items: center;
@@ -296,51 +303,29 @@
             z-index: 20;
             pointer-events: none;
             box-shadow: 0 2px 10px rgba(0,0,0,0.8);
+            white-space: nowrap;
         }
 
         .play-indicator i {
             color: #ff0055;
         }
 
-        /* 3. Espectro */
-        .bg-equalizer-gradient {
+        /* 3. Botón de Último Episodio (Debajo del círculo de GIF) */
+        .episode-block {
             position: absolute;
-            top: 50%;
+            top: 52%;
             left: 50%;
             transform: translateX(-50%);
-            width: 82%;
-            max-width: 330px;
-            height: 45px;
+            width: 100%;
             display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            z-index: 2;
-            opacity: 0.45;
-            pointer-events: none;
-            -webkit-mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
-            mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
-        }
-
-        .eq-bar-g {
-            flex: 1;
-            margin: 0 2px;
-            background: linear-gradient(to top, rgba(255,0,85,0.2), rgba(160,32,240,0.8));
-            border-radius: 3px;
-            animation: eqBounceGrad 1.2s ease-in-out infinite alternate;
-        }
-
-        .eq-bar-g:nth-child(odd) { animation-duration: 0.7s; }
-        .eq-bar-g:nth-child(even) { animation-duration: 1.3s; }
-
-        @keyframes eqBounceGrad {
-            0% { height: 8px; }
-            100% { height: 35px; }
+            justify-content: center;
+            z-index: 10;
         }
 
         /* 4. Emisora */
         .station-block {
             position: absolute;
-            top: 66%;
+            top: 63%;
             left: 50%;
             transform: translateX(-50%);
             width: 100%;
@@ -359,11 +344,11 @@
 
         .signature-slogan {
             position: absolute;
-            bottom: -13px;
+            bottom: -12px;
             left: 50%;
             transform: translateX(-50%);
             font-family: 'Great Vibes', cursive;
-            font-size: 1.15rem;
+            font-size: 1.05rem;
             color: #ffffff;
             font-weight: 400;
             text-shadow: 0 2px 5px rgba(0,0,0,0.9), 0 0 8px rgba(255,0,85,0.5);
@@ -375,7 +360,7 @@
         /* 5. Web oficial */
         .web-block {
             position: absolute;
-            top: 76%;
+            top: 74%;
             left: 50%;
             transform: translateX(-50%);
             width: 100%;
@@ -387,18 +372,12 @@
         .web-ellipse {
             font-size: 0.75rem;
             letter-spacing: 1.2px;
-            transition: all 0.3s ease;
-        }
-
-        .web-ellipse:hover {
-            background: rgba(255, 0, 85, 0.3);
-            transform: scale(1.02);
         }
 
         /* 6. WhatsApp */
         .whatsapp-block {
             position: absolute;
-            top: 85%;
+            top: 84%;
             left: 50%;
             transform: translateX(-50%);
             z-index: 10;
@@ -441,6 +420,9 @@
     <!-- Audio de Streaming en vivo -->
     <audio id="radioStream" preload="none"></audio>
 
+    <!-- Audio para el Último Episodio -->
+    <audio id="episodeStream" preload="none"></audio>
+
     <div class="wrapper">
         <div class="bg-glow-effect"></div>
 
@@ -464,30 +446,27 @@
                 </div>
             </div>
 
-            <!-- Firma añadida justo sobre el círculo de los GIFs -->
+            <!-- Firma sobre el círculo de los GIFs -->
             <div class="host-signature" id="uiHostSignature">con Eduardo Rincon</div>
 
-            <!-- 2. Círculo Central Interactivo -->
+            <!-- 2. Círculo Central Interactivo (Radio En Vivo) -->
             <div class="center-stage" id="playTrigger" title="Toca para reproducir / pausar en vivo">
                 <div class="video-circle-container">
                     <div class="video-circle" id="gifContainer"></div>
                     <div class="play-indicator" id="playStatusText">
-                        <i class="fa-solid fa-play" id="playIcon"></i> <span id="statusLabel">TOCA PARA ESCUCHAR</span>
+                        <i class="fa-solid fa-play" id="playIcon"></i> <span id="statusLabel">FUERA DE AIRE</span>
                     </div>
                 </div>
             </div>
 
-            <!-- 3. Espectro -->
-            <div class="bg-equalizer-gradient">
-                <div class="eq-bar-g" style="height: 15px;"></div>
-                <div class="eq-bar-g" style="height: 30px;"></div>
-                <div class="eq-bar-g" style="height: 10px;"></div>
-                <div class="eq-bar-g" style="height: 35px;"></div>
-                <div class="eq-bar-g" style="height: 20px;"></div>
-                <div class="eq-bar-g" style="height: 32px;"></div>
-                <div class="eq-bar-g" style="height: 15px;"></div>
-                <div class="eq-bar-g" style="height: 25px;"></div>
-                <div class="eq-bar-g" style="height: 10px;"></div>
+            <!-- 3. Botón de Último Episodio (Aparece solo si hay un archivo disponible) -->
+            <div class="episode-block" id="episodeContainerBlock" style="display: none;">
+                <div class="unified-ellipse" id="episodeTrigger" title="Reproducir último episodio">
+                    <div class="ellipse-text">
+                        <i class="fa-solid fa-play" id="episodeIcon" style="color: #ff0055; margin-right: 6px;"></i> 
+                        <span id="episodeLabel">ÚLTIMO EPISODIO</span>
+                    </div>
+                </div>
             </div>
 
             <!-- 4. Emisora -->
@@ -517,14 +496,13 @@
     </div>
 
     <script>
-        // Cargar los valores desde el archivo config.js a los elementos HTML
+        // Cargar los valores desde el archivo config.js
         if (typeof CONFIG !== 'undefined') {
             document.getElementById('uiProgramName').innerText = CONFIG.nombrePrograma;
             document.getElementById('uiHostSignature').innerText = CONFIG.conductor;
             document.getElementById('uiStationName').innerText = CONFIG.nombreEmisora;
             document.getElementById('uiStationSlogan').innerText = CONFIG.sloganEmisora;
             
-            // Enlace y texto de la Web configurados desde config.js
             const webLink = document.getElementById('uiWebLink');
             webLink.href = CONFIG.urlWebEmisora;
             document.getElementById('uiWebText').innerText = CONFIG.textoWeb;
@@ -535,17 +513,48 @@
 
         const bgAudio = document.getElementById('backgroundAudio');
         const audioStream = document.getElementById('radioStream');
+        const episodeStream = document.getElementById('episodeStream');
+        
         const playTrigger = document.getElementById('playTrigger');
         const playIcon = document.getElementById('playIcon');
         const statusLabel = document.getElementById('statusLabel');
-        let isPlayingLive = false;
 
-        // 1. Reproducir música de fondo al abrir el sitio automáticamente
+        const episodeContainerBlock = document.getElementById('episodeContainerBlock');
+        const episodeTrigger = document.getElementById('episodeTrigger');
+        const episodeIcon = document.getElementById('episodeIcon');
+        const episodeLabel = document.getElementById('episodeLabel');
+
+        let isPlayingLive = false;
+        let isPlayingEpisode = false;
+        let isLiveAllowed = false;
+
+        // Verificar si el horario actual corresponde al programa en vivo
+        function checkLiveAvailability() {
+            if (typeof CONFIG === 'undefined') return;
+
+            const now = new Date();
+            const currentDay = now.getDay();
+            const currentHour = now.getHours();
+
+            // Compara si es el día configurado y se encuentra dentro de las horas de inicio y fin
+            if (currentDay === CONFIG.diaPrograma && currentHour >= CONFIG.horaInicio && currentHour < CONFIG.horaFin) {
+                isLiveAllowed = true;
+                statusLabel.innerText = "TOCA PARA ESCUCHAR";
+            } else {
+                isLiveAllowed = false;
+                statusLabel.innerText = "FUERA DE AIRE";
+            }
+        }
+
+        // 1. Música de fondo automática al abrir la web
         window.addEventListener('load', () => {
+            checkLiveAvailability();
+            checkForLatestEpisode();
+
             bgAudio.volume = 0.5;
             bgAudio.play().catch(() => {
                 const unlockAudio = () => {
-                    if (!isPlayingLive && bgAudio.paused) {
+                    if (!isPlayingLive && !isPlayingEpisode && bgAudio.paused) {
                         bgAudio.play();
                     }
                     window.removeEventListener('click', unlockAudio);
@@ -554,7 +563,7 @@
             });
         });
 
-        // 2. Desvanecimiento rápido (Fade Out) de la música de fondo
+        // Desvanecimiento de la música de fondo
         function fadeOutBackground() {
             let fadeTimer = setInterval(() => {
                 if (bgAudio.volume > 0.05) {
@@ -567,9 +576,23 @@
             }, 50); 
         }
 
-        // 3. Control al hacer clic en "Toca para escuchar"
+        // 2. Control del botón principal (Radio en Vivo)
         playTrigger.addEventListener('click', () => {
+            // Validar si está en el horario permitido del config
+            if (!isLiveAllowed && !isPlayingLive) {
+                alert("El programa 'Rincón Gaitero' solo está disponible en vivo en su horario programado.");
+                return;
+            }
+
             if (!isPlayingLive) {
+                // Si el episodio estaba sonando, lo pausamos
+                if (isPlayingEpisode) {
+                    episodeStream.pause();
+                    isPlayingEpisode = false;
+                    episodeIcon.className = "fa-solid fa-play";
+                    episodeLabel.innerText = "ÚLTIMO EPISODIO";
+                }
+
                 if (!bgAudio.paused) {
                     fadeOutBackground();
                 }
@@ -579,17 +602,78 @@
                     playIcon.className = "fa-solid fa-stop"; 
                     statusLabel.innerText = "EN VIVO";
                 }).catch(error => {
-                    console.log("Error al reproducir el streaming:", error);
+                    console.log("Error al reproducir streaming:", error);
                 });
             } else {
                 audioStream.pause();
                 isPlayingLive = false;
                 playIcon.className = "fa-solid fa-play"; 
-                statusLabel.innerText = "PAUSADO";
+                statusLabel.innerText = isLiveAllowed ? "TOCA PARA ESCUCHAR" : "FUERA DE AIRE";
             }
         });
 
-        // 4. Carga y rotación automática de GIFs
+        // 3. Búsqueda automática del archivo de episodio más reciente disponible
+        async function checkForLatestEpisode() {
+            // Verificamos patrones comunes: episodio100 al 1, o formatos con fechas de ejemplo
+            // Probamos archivos numerados del 1 al 50 en orden descendente para hallar el más reciente
+            let foundEpisode = null;
+
+            for (let i = 50; i >= 1; i--) {
+                const fileName = `episodio${i}.mp3`;
+                if (await checkFileExists(fileName)) {
+                    foundEpisode = fileName;
+                    break;
+                }
+            }
+
+            // Si encuentra un episodio, configura el reproductor y muestra el botón
+            if (foundEpisode) {
+                episodeStream.src = foundEpisode;
+                episodeContainerBlock.style.display = "flex";
+            }
+        }
+
+        function checkFileExists(url) {
+            return new Promise(resolve => {
+                const xhr = new XMLHttpRequest();
+                xhr.open('HEAD', url, true);
+                xhr.onload = () => resolve(xhr.status === 200);
+                xhr.onerror = () => resolve(false);
+                xhr.send();
+            });
+        }
+
+        // Control al hacer clic en el botón de Último Episodio
+        episodeTrigger.addEventListener('click', () => {
+            if (!isPlayingEpisode) {
+                // Si la radio en vivo estaba sonando, la pausamos
+                if (isPlayingLive) {
+                    audioStream.pause();
+                    isPlayingLive = false;
+                    playIcon.className = "fa-solid fa-play";
+                    statusLabel.innerText = isLiveAllowed ? "TOCA PARA ESCUCHAR" : "FUERA DE AIRE";
+                }
+
+                if (!bgAudio.paused) {
+                    fadeOutBackground();
+                }
+
+                episodeStream.play().then(() => {
+                    isPlayingEpisode = true;
+                    episodeIcon.className = "fa-solid fa-stop";
+                    episodeLabel.innerText = "REPRODUCIENDO EPISODIO";
+                }).catch(error => {
+                    console.log("Error al reproducir episodio:", error);
+                });
+            } else {
+                episodeStream.pause();
+                isPlayingEpisode = false;
+                episodeIcon.className = "fa-solid fa-play";
+                episodeLabel.innerText = "ÚLTIMO EPISODIO";
+            }
+        });
+
+        // 4. Carga y rotación de GIFs
         async function loadGifsAutomatically() {
             const container = document.getElementById('gifContainer');
             let index = 1;
@@ -624,15 +708,6 @@
             }
         }
 
-        function checkImageExists(url) {
-            return new Promise(resolve => {
-                const img = new Image();
-                img.onload = () => resolve(true);
-                img.onerror = () => resolve(false);
-                img.src = url;
-            });
-        }
-
         function initDynamicGifRotator() {
             const slides = document.querySelectorAll('.gif-slide');
             let currentSlide = 0;
@@ -645,28 +720,28 @@
             }, slideDuration);
         }
 
-        // 5. Horario 100% dinámico basado en config.js
+        // 5. Horario dinámico en la cabecera
         function updateDynamicSchedule() {
             const scheduleElement = document.getElementById('dynamicScheduleText');
             if (typeof CONFIG === 'undefined') return;
 
-            const targetDay = CONFIG.diaPrograma; // 0=Domingo, 1=Lunes, etc.
-            const timeString = `de ${CONFIG.horaInicio} a ${CONFIG.horaFin}`;
+            const targetDay = CONFIG.diaPrograma; 
+            const timeString = `de ${CONFIG.textoHoraInicio} a ${CONFIG.textoHoraFin}`;
 
             const now = new Date();
             const currentDay = now.getDay(); 
 
-            const nombresDias = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
-            const nombreDiaObjetivo = nombresDias[targetDay];
+            const nombresDias = ["domingos", "lunes", "martes", "miércoles", "jueves", "viernes", "sábados"];
+            const nombreDiaSingular = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"][targetDay];
 
             let diffDays = targetDay - currentDay;
 
             if (diffDays === 0) {
                 scheduleElement.innerText = `hoy ${timeString}`;
             } else if (diffDays === 1 || diffDays === -6) {
-                scheduleElement.innerText = `mañana ${nombreDiaObjetivo} ${timeString}`;
+                scheduleElement.innerText = `mañana ${nombreDiaSingular} ${timeString}`;
             } else {
-                scheduleElement.innerText = `próximo ${nombreDiaObjetivo} ${timeString}`;
+                scheduleElement.innerText = `${nombresDias[targetDay]} ${timeString}`;
             }
         }
 
