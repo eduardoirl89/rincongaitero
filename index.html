@@ -113,7 +113,7 @@
             height: 100%;
         }
 
-        /* CLASE ÚNICA Y UNIFICADA PARA LAS TRES ELIPSES */
+        /* CLASE UNIFICADA PARA LAS ELIPSES */
         .unified-ellipse {
             background: rgba(255, 0, 85, 0.15);
             backdrop-filter: blur(8px);
@@ -146,7 +146,7 @@
             text-transform: uppercase;
         }
 
-        /* 1. Cabecera (Rincón Gaitero) */
+        /* 1. Cabecera */
         .header-container-relative {
             position: absolute;
             top: 8%;
@@ -202,7 +202,7 @@
             pointer-events: none;
         }
 
-        /* 2. Círculo del GIF */
+        /* 2. Círculo central */
         .center-stage {
             position: absolute;
             top: 38%;
@@ -260,7 +260,6 @@
             opacity: 1;
         }
 
-        /* Indicador de reproducción flotante sobre el círculo */
         .play-indicator {
             position: absolute;
             bottom: 10px;
@@ -286,7 +285,7 @@
             color: #ff0055;
         }
 
-        /* Espectro de sonido */
+        /* 3. Espectro de sonido */
         .bg-equalizer-gradient {
             position: absolute;
             top: 48%;
@@ -321,7 +320,7 @@
             100% { height: 35px; }
         }
 
-        /* 4. Bloque Emisora + Slogan */
+        /* 4. Emisora + Slogan */
         .station-block {
             position: absolute;
             top: 65%;
@@ -356,7 +355,7 @@
             pointer-events: none;
         }
 
-        /* 5. Link Web Oficial */
+        /* 5. Web oficial */
         .web-block {
             position: absolute;
             top: 77%;
@@ -379,10 +378,10 @@
             transform: scale(1.02);
         }
 
-        /* 6. Botón de WhatsApp */
+        /* 6. WhatsApp */
         .whatsapp-block {
             position: absolute;
-            top: 88%;
+            top: 85%;
             left: 50%;
             transform: translateX(-50%);
             z-index: 10;
@@ -416,14 +415,14 @@
 </head>
 <body>
 
-    <!-- Audio de Fondo Inicial (Asegúrate de tener un archivo llamado 'musica_fondo.mp3' o cambia el nombre) -->
+    <!-- Música de fondo que arranca al abrir el sitio -->
     <audio id="backgroundAudio" loop src="musica_fondo.mp3"></audio>
 
-    <!-- Reproductor de Audio en Streaming para la Radio en Vivo -->
-    <audio id="radioStream" preload="none" src="https://sonic.instanet.tv:9446/stream"></audio>
+    <!-- Reproductor de Streaming en Vivo (Reemplaza la URL de src con tu enlace válido) -->
+    <audio id="radioStream" preload="none" src="https://acp4.lorini.net:50010/stream
+"></audio>
 
     <div class="wrapper">
-        <!-- Fondo animado -->
         <div class="bg-glow-effect"></div>
 
         <div class="bg-typography">
@@ -434,7 +433,7 @@
         </div>
 
         <div class="content-layer">
-            <!-- 1. Insignia Superior ("Rincón Gaitero") -->
+            <!-- 1. Cabecera -->
             <div class="header-container-relative">
                 <div class="header-box-wrapper">
                     <img src="cuatro.png" alt="Cuatro" class="cuatro-inline" onerror="this.style.display='none'">
@@ -446,17 +445,17 @@
                 </div>
             </div>
 
-            <!-- 2. Círculo del GIF (Interactivo) -->
+            <!-- 2. Círculo Central Interactivo -->
             <div class="center-stage" id="playTrigger" title="Toca para reproducir / pausar en vivo">
                 <div class="video-circle-container">
                     <div class="video-circle" id="gifContainer"></div>
                     <div class="play-indicator" id="playStatusText">
-                        <i class="fa-solid fa-play" id="playIcon"></i> <span id="labelState">TOCA PARA ESCUCHAR</span>
+                        <i class="fa-solid fa-play" id="playIcon"></i> <span id="statusLabel">TOCA PARA ESCUCHAR</span>
                     </div>
                 </div>
             </div>
 
-            <!-- 3. Espectro de sonido -->
+            <!-- 3. Espectro -->
             <div class="bg-equalizer-gradient">
                 <div class="eq-bar-g" style="height: 15px;"></div>
                 <div class="eq-bar-g" style="height: 30px;"></div>
@@ -469,7 +468,7 @@
                 <div class="eq-bar-g" style="height: 10px;"></div>
             </div>
 
-            <!-- 4. Bloque Emisora + Slogan -->
+            <!-- 4. Emisora -->
             <div class="station-block">
                 <div class="station-container-relative">
                     <div class="unified-ellipse">
@@ -479,14 +478,14 @@
                 </div>
             </div>
 
-            <!-- 5. Link Web Oficial -->
+            <!-- 5. Web Oficial -->
             <div class="web-block">
                 <a href="https://www.ondaciudadbolivar.com" target="_blank" class="unified-ellipse web-ellipse">
                     <div class="ellipse-text" style="font-size: 0.75rem;">WWW.ONDACIUDADBOLIVAR.COM</div>
                 </a>
             </div>
 
-            <!-- 6. Botón WhatsApp -->
+            <!-- 6. WhatsApp -->
             <div class="whatsapp-block">
                 <a href="https://wa.me/NUMEROAQUI?text=Hola,%20sintonizo%20Rincón%20Gaitero" target="_blank" class="whatsapp-trigger" title="Escríbenos por WhatsApp">
                     <i class="fa-brands fa-whatsapp"></i>
@@ -500,14 +499,14 @@
         const audioStream = document.getElementById('radioStream');
         const playTrigger = document.getElementById('playTrigger');
         const playIcon = document.getElementById('playIcon');
-        const labelState = document.getElementById('labelState');
+        const statusLabel = document.getElementById('statusLabel');
         let isPlayingLive = false;
 
-        // Intentar reproducir la música de fondo al cargar la página
+        // 1. Reproducir música de fondo al abrir el sitio
         window.addEventListener('load', () => {
-            bgAudio.volume = 0.5; // Volumen inicial al 50%
+            bgAudio.volume = 0.6; // Volumen inicial al 60%
             bgAudio.play().catch(() => {
-                // Si el navegador bloquea el autoplay inicial, arrancará en cuanto el usuario toque cualquier parte de la web por primera vez
+                // Si el navegador bloquea el autoplay estricto, arranca con el primer toque del usuario en la pantalla
                 document.body.addEventListener('click', () => {
                     if (!isPlayingLive && bgAudio.paused) {
                         bgAudio.play();
@@ -516,45 +515,45 @@
             });
         });
 
-        // Función para hacer desvanecimiento (Fade Out) del audio de fondo
-        function fadeOutBackgroundAudio() {
-            let fadeInterval = setInterval(() => {
+        // 2. Función de desvanecimiento (Fade Out) para la música de fondo
+        function fadeOutBackgroundMusic() {
+            let fadeTimer = setInterval(() => {
                 if (bgAudio.volume > 0.05) {
                     bgAudio.volume -= 0.05;
                 } else {
                     bgAudio.pause();
-                    bgAudio.volume = 0.5; // Restaurar volumen por si se vuelve a usar
-                    clearInterval(fadeInterval);
+                    bgAudio.volume = 0.6; // Restaurar volumen por si se detiene el streaming
+                    clearInterval(fadeTimer);
                 }
-            }, 100); // Baja el volumen gradualmente cada 100 milisegundos
+            }, 100); // Reduce el volumen cada 100ms de forma suave
         }
 
-        // Control al hacer clic en el círculo central
+        // 3. Control principal al hacer clic en el botón central ("Toca para escuchar")
         playTrigger.addEventListener('click', () => {
             if (!isPlayingLive) {
-                // 1. Si suena la música de fondo, aplicamos desvanecimiento y la detenemos
+                // Apagar la música de fondo con desvanecimiento si está sonando
                 if (!bgAudio.paused) {
-                    fadeOutBackgroundAudio();
+                    fadeOutBackgroundMusic();
                 }
 
-                // 2. Reproducir el streaming en vivo
+                // Iniciar la radio en vivo
                 audioStream.play().then(() => {
                     isPlayingLive = true;
-                    playIcon.className = "fa-solid fa-stop"; // Cambia a icono de Stop
-                    labelState.innerText = "EN VIVO";
+                    playIcon.className = "fa-solid fa-stop"; // Cambia el icono a STOP
+                    statusLabel.innerText = "EN VIVO";
                 }).catch(error => {
-                    console.log("Error al reproducir streaming:", error);
+                    console.log("Error al reproducir streaming en vivo:", error);
                 });
             } else {
                 // Pausar / Detener la radio en vivo
                 audioStream.pause();
                 isPlayingLive = false;
-                playIcon.className = "fa-solid fa-play"; // Cambia a Play
-                labelState.innerText = "PAUSADO";
+                playIcon.className = "fa-solid fa-play"; // Cambia el icono a PLAY
+                statusLabel.innerText = "PAUSADO";
             }
         });
 
-        // Carga automática y rotación de GIFs
+        // 4. Carga y rotación automática de GIFs
         async function loadGifsAutomatically() {
             const container = document.getElementById('gifContainer');
             let index = 1;
