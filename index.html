@@ -202,7 +202,7 @@
             pointer-events: none;
         }
 
-        /* 2. Círculo del GIF (Interactivo: Clic para reproducir/pausar la radio en vivo) */
+        /* 2. Círculo del GIF */
         .center-stage {
             position: absolute;
             top: 38%;
@@ -416,7 +416,10 @@
 </head>
 <body>
 
-    <!-- Reproductor de Audio en Streaming para la Radio -->
+    <!-- Audio de Fondo Inicial (Asegúrate de tener un archivo llamado 'musica_fondo.mp3' o cambia el nombre) -->
+    <audio id="backgroundAudio" loop src="musica_fondo.mp3"></audio>
+
+    <!-- Reproductor de Audio en Streaming para la Radio en Vivo -->
     <audio id="radioStream" preload="none" src="https://sonic.instanet.tv:9446/stream"></audio>
 
     <div class="wrapper">
@@ -434,7 +437,6 @@
             <!-- 1. Insignia Superior ("Rincón Gaitero") -->
             <div class="header-container-relative">
                 <div class="header-box-wrapper">
-                    <!-- Cuatro flotando a la izquierda -->
                     <img src="cuatro.png" alt="Cuatro" class="cuatro-inline" onerror="this.style.display='none'">
                     
                     <div class="unified-ellipse">
@@ -444,12 +446,12 @@
                 </div>
             </div>
 
-            <!-- 2. Círculo del GIF (Interactivo: Clic para reproducir/pausar la radio en vivo) -->
+            <!-- 2. Círculo del GIF (Interactivo) -->
             <div class="center-stage" id="playTrigger" title="Toca para reproducir / pausar en vivo">
                 <div class="video-circle-container">
                     <div class="video-circle" id="gifContainer"></div>
                     <div class="play-indicator" id="playStatusText">
-                        <i class="fa-solid fa-play" id="playIcon"></i> <span id="statusLabel">TOCA PARA ESCUCHAR</span>
+                        <i class="fa-solid fa-play" id="playIcon"></i> <span id="labelState">TOCA PARA ESCUCHAR</span>
                     </div>
                 </div>
             </div>
@@ -486,7 +488,7 @@
 
             <!-- 6. Botón WhatsApp -->
             <div class="whatsapp-block">
-                <a href="https://wa.me/584148920921?text=Hola,%20sintonizo%20Rincón%20Gaitero" target="_blank" class="whatsapp-trigger" title="Escríbenos por WhatsApp">
+                <a href="https://wa.me/NUMEROAQUI?text=Hola,%20sintonizo%20Rincón%20Gaitero" target="_blank" class="whatsapp-trigger" title="Escríbenos por WhatsApp">
                     <i class="fa-brands fa-whatsapp"></i>
                 </a>
             </div>
@@ -494,31 +496,65 @@
     </div>
 
     <script>
-        // A. Control del reproductor de streaming de audio
+        const bgAudio = document.getElementById('backgroundAudio');
         const audioStream = document.getElementById('radioStream');
         const playTrigger = document.getElementById('playTrigger');
         const playIcon = document.getElementById('playIcon');
-        const statusLabel = document.getElementById('statusLabel');
-        let isPlaying = false;
+        const labelState = document.getElementById('labelState');
+        let isPlayingLive = false;
 
+        // Intentar reproducir la música de fondo al cargar la página
+        window.addEventListener('load', () => {
+            bgAudio.volume = 0.5; // Volumen inicial al 50%
+            bgAudio.play().catch(() => {
+                // Si el navegador bloquea el autoplay inicial, arrancará en cuanto el usuario toque cualquier parte de la web por primera vez
+                document.body.addEventListener('click', () => {
+                    if (!isPlayingLive && bgAudio.paused) {
+                        bgAudio.play();
+                    }
+                }, { once: true });
+            });
+        });
+
+        // Función para hacer desvanecimiento (Fade Out) del audio de fondo
+        function fadeOutBackgroundAudio() {
+            let fadeInterval = setInterval(() => {
+                if (bgAudio.volume > 0.05) {
+                    bgAudio.volume -= 0.05;
+                } else {
+                    bgAudio.pause();
+                    bgAudio.volume = 0.5; // Restaurar volumen por si se vuelve a usar
+                    clearInterval(fadeInterval);
+                }
+            }, 100); // Baja el volumen gradualmente cada 100 milisegundos
+        }
+
+        // Control al hacer clic en el círculo central
         playTrigger.addEventListener('click', () => {
-            if (!isPlaying) {
+            if (!isPlayingLive) {
+                // 1. Si suena la música de fondo, aplicamos desvanecimiento y la detenemos
+                if (!bgAudio.paused) {
+                    fadeOutBackgroundAudio();
+                }
+
+                // 2. Reproducir el streaming en vivo
                 audioStream.play().then(() => {
-                    isPlaying = true;
-                    playIcon.className = "fa-solid fa-pause";
-                    statusLabel.innerText = "EN VIVO";
+                    isPlayingLive = true;
+                    playIcon.className = "fa-solid fa-stop"; // Cambia a icono de Stop
+                    labelState.innerText = "EN VIVO";
                 }).catch(error => {
-                    console.log("Error al reproducir audio:", error);
+                    console.log("Error al reproducir streaming:", error);
                 });
             } else {
+                // Pausar / Detener la radio en vivo
                 audioStream.pause();
-                isPlaying = false;
-                playIcon.className = "fa-solid fa-play";
-                statusLabel.innerText = "PAUSADO";
+                isPlayingLive = false;
+                playIcon.className = "fa-solid fa-play"; // Cambia a Play
+                labelState.innerText = "PAUSADO";
             }
         });
 
-        // B. Carga automática y rotación de GIFs con fundido a la mitad de su duración
+        // Carga automática y rotación de GIFs
         async function loadGifsAutomatically() {
             const container = document.getElementById('gifContainer');
             let index = 1;
