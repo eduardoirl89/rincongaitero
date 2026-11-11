@@ -490,6 +490,20 @@
             font-size: 1rem;
         }
     </style>
+
+<!-- Enlace para activar PWA (Instalación de acceso directo) -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ff0055">
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker registrado con éxito', reg))
+                    .catch(err => console.log('Error al registrar Service Worker', err));
+            });
+        }
+    </script>
+
 </head>
 <body>
 

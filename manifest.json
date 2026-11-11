@@ -1,0 +1,20 @@
+{
+  "name": "Rincón Gaitero",
+  "short_name": "Rincón Gaitero",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d0614",
+  "theme_color": "#ff0055",
+  "icons": [
+    {
+      "src": "logos/cuatro.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "logos/cuatro.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
