@@ -674,24 +674,14 @@
         });
 
         // 4. Carga y rotación de GIFs
-        async function loadGifsAutomatically() {
+     // Carga directa de los GIFs disponibles (gif1.gif hasta gif4.gif)
+        function loadGifsAutomatically() {
             const container = document.getElementById('gifContainer');
-            let index = 1;
+            const totalGifs = 4; // Tienes 4 GIFs subidos en tu repositorio
             let loadedImages = [];
 
-            while (index <= 20) {
-                const gifPath = `gif${index}.gif`;
-                const exists = await checkImageExists(gifPath);
-                if (exists) {
-                    loadedImages.push(gifPath);
-                    index++;
-                } else {
-                    break;
-                }
-            }
-
-            if (loadedImages.length === 0) {
-                loadedImages.push('gif1.gif');
+            for (let i = 1; i <= totalGifs; i++) {
+                loadedImages.push(`gif${i}.gif`);
             }
 
             container.innerHTML = '';
@@ -711,12 +701,14 @@
         function initDynamicGifRotator() {
             const slides = document.querySelectorAll('.gif-slide');
             let currentSlide = 0;
-            const slideDuration = 2500; 
+            const slideDuration = 2500; // Cambia de GIF cada 2.5 segundos
 
             setInterval(() => {
-                slides[currentSlide].classList.remove('active');
-                currentSlide = (currentSlide + 1) % slides.length;
-                slides[currentSlide].classList.add('active');
+                if (slides.length > 0) {
+                    slides[currentSlide].classList.remove('active');
+                    currentSlide = (currentSlide + 1) % slides.length;
+                    slides[currentSlide].classList.add('active');
+                }
             }, slideDuration);
         }
 
