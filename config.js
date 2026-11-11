@@ -9,8 +9,8 @@ const CONFIG = {
     horaFin: 17,            // Hora militar de fin (Ej: 18 para las 6:00 PM)
     
     // Textos visibles del horario
-    textoHoraInicio: "4 pm",
-    textoHoraFin: "6 pm",
+    textoHoraInicio: "3 pm",
+    textoHoraFin: "5 pm",
 
     nombreEmisora: "ONDA 103.5 FM",
     sloganEmisora: "La Super Estación",
