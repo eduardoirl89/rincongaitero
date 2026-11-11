@@ -202,10 +202,27 @@
             pointer-events: none;
         }
 
+        /* Firma: "con Eduardo Rincon" sobre el círculo */
+        .host-signature {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Great Vibes', cursive;
+            font-size: 2.2rem;
+            color: #ffffff;
+            font-weight: 400;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.9), 0 0 10px rgba(255,0,85,0.6);
+            white-space: nowrap;
+            z-index: 15;
+            pointer-events: none;
+            letter-spacing: 0.5px;
+        }
+
         /* 2. Círculo Central */
         .center-stage {
             position: absolute;
-            top: 38%;
+            top: 40%;
             left: 50%;
             transform: translate(-50%, -50%);
             display: flex;
@@ -217,8 +234,8 @@
 
         .video-circle-container {
             position: relative;
-            width: 250px;
-            height: 250px;
+            width: 240px;
+            height: 240px;
             border-radius: 50%;
             padding: 5px;
             background: linear-gradient(135deg, rgba(255,0,85,0.8), rgba(160,32,240,0.8));
@@ -288,7 +305,7 @@
         /* 3. Espectro */
         .bg-equalizer-gradient {
             position: absolute;
-            top: 48%;
+            top: 50%;
             left: 50%;
             transform: translateX(-50%);
             width: 82%;
@@ -323,7 +340,7 @@
         /* 4. Emisora */
         .station-block {
             position: absolute;
-            top: 65%;
+            top: 66%;
             left: 50%;
             transform: translateX(-50%);
             width: 100%;
@@ -358,7 +375,7 @@
         /* 5. Web oficial */
         .web-block {
             position: absolute;
-            top: 77%;
+            top: 76%;
             left: 50%;
             transform: translateX(-50%);
             width: 100%;
@@ -415,12 +432,14 @@
 </head>
 <body>
 
+    <!-- Archivo de configuración externo -->
+    <script src="config.js"></script>
+
     <!-- Audio de música de fondo automática -->
     <audio id="backgroundAudio" loop src="musica_fondo.mp3"></audio>
 
     <!-- Audio de Streaming en vivo -->
-    <audio id="radioStream" preload="none" src="https://acp4.lorini.net:50010/stream
-"></audio>
+    <audio id="radioStream" preload="none"></audio>
 
     <div class="wrapper">
         <div class="bg-glow-effect"></div>
@@ -439,11 +458,14 @@
                     <img src="cuatro.png" alt="Cuatro" class="cuatro-inline" onerror="this.style.display='none'">
                     
                     <div class="unified-ellipse">
-                        <div class="ellipse-text">RINCON GAITERO</div>
+                        <div class="ellipse-text" id="uiProgramName">RINCON GAITERO</div>
                     </div>
-                    <div class="dynamic-signature-schedule" id="dynamicScheduleText">domingos de 4pm a 6pm</div>
+                    <div class="dynamic-signature-schedule" id="dynamicScheduleText">cargando horario...</div>
                 </div>
             </div>
+
+            <!-- Firma añadida justo sobre el círculo de los GIFs -->
+            <div class="host-signature" id="uiHostSignature">con Eduardo Rincon</div>
 
             <!-- 2. Círculo Central Interactivo -->
             <div class="center-stage" id="playTrigger" title="Toca para reproducir / pausar en vivo">
@@ -472,22 +494,22 @@
             <div class="station-block">
                 <div class="station-container-relative">
                     <div class="unified-ellipse">
-                        <div class="ellipse-text">ONDA 103.5 FM</div>
+                        <div class="ellipse-text" id="uiStationName">ONDA 103.5 FM</div>
                     </div>
-                    <div class="signature-slogan">La Super Estación</div>
+                    <div class="signature-slogan" id="uiStationSlogan">La Super Estación</div>
                 </div>
             </div>
 
             <!-- 5. Web Oficial -->
             <div class="web-block">
-                <a href="https://www.ondaciudadbolivar.com" target="_blank" class="unified-ellipse web-ellipse">
-                    <div class="ellipse-text" style="font-size: 0.75rem;">WWW.ONDACIUDADBOLIVAR.COM</div>
+                <a href="#" target="_blank" class="unified-ellipse web-ellipse" id="uiWebLink">
+                    <div class="ellipse-text" style="font-size: 0.75rem;" id="uiWebText">WWW.ONDACIUDADBOLIVAR.COM</div>
                 </a>
             </div>
 
             <!-- 6. WhatsApp -->
             <div class="whatsapp-block">
-                <a href="https://wa.me/584148920921?text=Hola,%20sintonizo%20Rincón%20Gaitero" target="_blank" class="whatsapp-trigger" title="Escríbenos por WhatsApp">
+                <a href="#" target="_blank" class="whatsapp-trigger" id="uiWhatsappLink" title="Escríbenos por WhatsApp">
                     <i class="fa-brands fa-whatsapp"></i>
                 </a>
             </div>
@@ -495,6 +517,22 @@
     </div>
 
     <script>
+        // Cargar los valores desde el archivo config.js a los elementos HTML
+        if (typeof CONFIG !== 'undefined') {
+            document.getElementById('uiProgramName').innerText = CONFIG.nombrePrograma;
+            document.getElementById('uiHostSignature').innerText = CONFIG.conductor;
+            document.getElementById('uiStationName').innerText = CONFIG.nombreEmisora;
+            document.getElementById('uiStationSlogan').innerText = CONFIG.sloganEmisora;
+            
+            // Enlace y texto de la Web configurados desde config.js
+            const webLink = document.getElementById('uiWebLink');
+            webLink.href = CONFIG.urlWebEmisora;
+            document.getElementById('uiWebText').innerText = CONFIG.textoWeb;
+
+            document.getElementById('radioStream').src = CONFIG.urlStreamRadio;
+            document.getElementById('uiWhatsappLink').href = `https://wa.me/${CONFIG.whatsappNumero}?text=${CONFIG.whatsappMensaje}`;
+        }
+
         const bgAudio = document.getElementById('backgroundAudio');
         const audioStream = document.getElementById('radioStream');
         const playTrigger = document.getElementById('playTrigger');
@@ -504,10 +542,8 @@
 
         // 1. Reproducir música de fondo al abrir el sitio automáticamente
         window.addEventListener('load', () => {
-            bgAudio.volume = 0.5; // Volumen al 50%
+            bgAudio.volume = 0.5;
             bgAudio.play().catch(() => {
-                // Nota de seguridad de los navegadores: si bloquean el autoplay de entrada,
-                // la música arrancará de inmediato con el primer toque que haga el usuario en la pantalla.
                 const unlockAudio = () => {
                     if (!isPlayingLive && bgAudio.paused) {
                         bgAudio.play();
@@ -522,36 +558,33 @@
         function fadeOutBackground() {
             let fadeTimer = setInterval(() => {
                 if (bgAudio.volume > 0.05) {
-                    bgAudio.volume -= 0.1; // Baja el volumen rápidamente en cada paso
+                    bgAudio.volume -= 0.1; 
                 } else {
                     bgAudio.pause();
-                    bgAudio.volume = 0.5; // Restablecer volumen
+                    bgAudio.volume = 0.5; 
                     clearInterval(fadeTimer);
                 }
-            }, 50); // Intervalo de 50ms para un desvanecimiento casi inmediato
+            }, 50); 
         }
 
         // 3. Control al hacer clic en "Toca para escuchar"
         playTrigger.addEventListener('click', () => {
             if (!isPlayingLive) {
-                // Apagar la música de fondo con desvanecimiento inmediato si estaba sonando
                 if (!bgAudio.paused) {
                     fadeOutBackground();
                 }
 
-                // Iniciar la transmisión en vivo
                 audioStream.play().then(() => {
                     isPlayingLive = true;
-                    playIcon.className = "fa-solid fa-stop"; // Cambia a icono de STOP
+                    playIcon.className = "fa-solid fa-stop"; 
                     statusLabel.innerText = "EN VIVO";
                 }).catch(error => {
                     console.log("Error al reproducir el streaming:", error);
                 });
             } else {
-                // Pausar / Detener el streaming en vivo
                 audioStream.pause();
                 isPlayingLive = false;
-                playIcon.className = "fa-solid fa-play"; // Cambia a PLAY
+                playIcon.className = "fa-solid fa-play"; 
                 statusLabel.innerText = "PAUSADO";
             }
         });
@@ -612,17 +645,28 @@
             }, slideDuration);
         }
 
+        // 5. Horario 100% dinámico basado en config.js
         function updateDynamicSchedule() {
-            const now = new Date();
-            const dayOfWeek = now.getDay(); 
             const scheduleElement = document.getElementById('dynamicScheduleText');
+            if (typeof CONFIG === 'undefined') return;
 
-            if (dayOfWeek === 0) {
-                scheduleElement.innerText = "hoy de 4pm a 6pm";
-            } else if (dayOfWeek === 6) {
-                scheduleElement.innerText = "mañana domingo de 4pm a 6pm";
+            const targetDay = CONFIG.diaPrograma; // 0=Domingo, 1=Lunes, etc.
+            const timeString = `de ${CONFIG.horaInicio} a ${CONFIG.horaFin}`;
+
+            const now = new Date();
+            const currentDay = now.getDay(); 
+
+            const nombresDias = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+            const nombreDiaObjetivo = nombresDias[targetDay];
+
+            let diffDays = targetDay - currentDay;
+
+            if (diffDays === 0) {
+                scheduleElement.innerText = `hoy ${timeString}`;
+            } else if (diffDays === 1 || diffDays === -6) {
+                scheduleElement.innerText = `mañana ${nombreDiaObjetivo} ${timeString}`;
             } else {
-                scheduleElement.innerText = "próximo domingo de 4pm a 6pm";
+                scheduleElement.innerText = `próximo ${nombreDiaObjetivo} ${timeString}`;
             }
         }
 
