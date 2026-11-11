@@ -202,7 +202,7 @@
             pointer-events: none;
         }
 
-        /* 2. Círculo central */
+        /* 2. Círculo Central */
         .center-stage {
             position: absolute;
             top: 38%;
@@ -285,7 +285,7 @@
             color: #ff0055;
         }
 
-        /* 3. Espectro de sonido */
+        /* 3. Espectro */
         .bg-equalizer-gradient {
             position: absolute;
             top: 48%;
@@ -320,7 +320,7 @@
             100% { height: 35px; }
         }
 
-        /* 4. Emisora + Slogan */
+        /* 4. Emisora */
         .station-block {
             position: absolute;
             top: 65%;
@@ -415,10 +415,10 @@
 </head>
 <body>
 
-    <!-- Música de fondo que arranca al abrir el sitio -->
+    <!-- Audio de música de fondo automática -->
     <audio id="backgroundAudio" loop src="musica_fondo.mp3"></audio>
 
-    <!-- Reproductor de Streaming en Vivo (Reemplaza la URL de src con tu enlace válido) -->
+    <!-- Audio de Streaming en vivo -->
     <audio id="radioStream" preload="none" src="https://acp4.lorini.net:50010/stream
 "></audio>
 
@@ -487,7 +487,7 @@
 
             <!-- 6. WhatsApp -->
             <div class="whatsapp-block">
-                <a href="https://wa.me/NUMEROAQUI?text=Hola,%20sintonizo%20Rincón%20Gaitero" target="_blank" class="whatsapp-trigger" title="Escríbenos por WhatsApp">
+                <a href="https://wa.me/584148920921?text=Hola,%20sintonizo%20Rincón%20Gaitero" target="_blank" class="whatsapp-trigger" title="Escríbenos por WhatsApp">
                     <i class="fa-brands fa-whatsapp"></i>
                 </a>
             </div>
@@ -502,53 +502,56 @@
         const statusLabel = document.getElementById('statusLabel');
         let isPlayingLive = false;
 
-        // 1. Reproducir música de fondo al abrir el sitio
+        // 1. Reproducir música de fondo al abrir el sitio automáticamente
         window.addEventListener('load', () => {
-            bgAudio.volume = 0.6; // Volumen inicial al 60%
+            bgAudio.volume = 0.5; // Volumen al 50%
             bgAudio.play().catch(() => {
-                // Si el navegador bloquea el autoplay estricto, arranca con el primer toque del usuario en la pantalla
-                document.body.addEventListener('click', () => {
+                // Nota de seguridad de los navegadores: si bloquean el autoplay de entrada,
+                // la música arrancará de inmediato con el primer toque que haga el usuario en la pantalla.
+                const unlockAudio = () => {
                     if (!isPlayingLive && bgAudio.paused) {
                         bgAudio.play();
                     }
-                }, { once: true });
+                    window.removeEventListener('click', unlockAudio);
+                };
+                window.addEventListener('click', unlockAudio);
             });
         });
 
-        // 2. Función de desvanecimiento (Fade Out) para la música de fondo
-        function fadeOutBackgroundMusic() {
+        // 2. Desvanecimiento rápido (Fade Out) de la música de fondo
+        function fadeOutBackground() {
             let fadeTimer = setInterval(() => {
                 if (bgAudio.volume > 0.05) {
-                    bgAudio.volume -= 0.05;
+                    bgAudio.volume -= 0.1; // Baja el volumen rápidamente en cada paso
                 } else {
                     bgAudio.pause();
-                    bgAudio.volume = 0.6; // Restaurar volumen por si se detiene el streaming
+                    bgAudio.volume = 0.5; // Restablecer volumen
                     clearInterval(fadeTimer);
                 }
-            }, 100); // Reduce el volumen cada 100ms de forma suave
+            }, 50); // Intervalo de 50ms para un desvanecimiento casi inmediato
         }
 
-        // 3. Control principal al hacer clic en el botón central ("Toca para escuchar")
+        // 3. Control al hacer clic en "Toca para escuchar"
         playTrigger.addEventListener('click', () => {
             if (!isPlayingLive) {
-                // Apagar la música de fondo con desvanecimiento si está sonando
+                // Apagar la música de fondo con desvanecimiento inmediato si estaba sonando
                 if (!bgAudio.paused) {
-                    fadeOutBackgroundMusic();
+                    fadeOutBackground();
                 }
 
-                // Iniciar la radio en vivo
+                // Iniciar la transmisión en vivo
                 audioStream.play().then(() => {
                     isPlayingLive = true;
-                    playIcon.className = "fa-solid fa-stop"; // Cambia el icono a STOP
+                    playIcon.className = "fa-solid fa-stop"; // Cambia a icono de STOP
                     statusLabel.innerText = "EN VIVO";
                 }).catch(error => {
-                    console.log("Error al reproducir streaming en vivo:", error);
+                    console.log("Error al reproducir el streaming:", error);
                 });
             } else {
-                // Pausar / Detener la radio en vivo
+                // Pausar / Detener el streaming en vivo
                 audioStream.pause();
                 isPlayingLive = false;
-                playIcon.className = "fa-solid fa-play"; // Cambia el icono a PLAY
+                playIcon.className = "fa-solid fa-play"; // Cambia a PLAY
                 statusLabel.innerText = "PAUSADO";
             }
         });
