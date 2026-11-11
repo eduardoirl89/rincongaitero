@@ -267,7 +267,7 @@
             position: relative;
         }
 
-        .gif-slide {
+        .media-slide {
             position: absolute;
             top: 0;
             left: 0;
@@ -278,7 +278,7 @@
             transition: opacity 1.5s ease-in-out;
         }
 
-        .gif-slide.active {
+        .media-slide.active {
             opacity: 1;
         }
 
@@ -496,8 +496,8 @@
     <!-- Archivo de configuración externo -->
     <script src="config.js"></script>
 
-    <!-- Audios -->
-    <audio id="backgroundAudio" loop src="musica_fondo.mp3"></audio>
+    <!-- Audios (Rutas apuntando a carpetas /audio/ y /episodios/) -->
+    <audio id="backgroundAudio" loop src="audio/musica_fondo.mp3"></audio>
     <audio id="radioStream" preload="none"></audio>
     <audio id="episodeStream" preload="metadata"></audio>
 
@@ -515,7 +515,8 @@
             <!-- 1. Cabecera -->
             <div class="header-container-relative">
                 <div class="header-box-wrapper">
-                    <img src="cuatro.png" alt="Cuatro" class="cuatro-inline" onerror="this.style.display='none'">
+                    <!-- Ruta al logo del cuatro en /logos/ -->
+                    <img src="logos/cuatro.png" alt="Cuatro" class="cuatro-inline" onerror="this.src='cuatro.png';">
                     
                     <div class="unified-ellipse">
                         <div class="ellipse-text" id="uiProgramName">RINCON GAITERO</div>
@@ -537,11 +538,10 @@
                 </div>
             </div>
 
-            <!-- 3. Panel de Episodios (Selector + Play/Pause + Barra de Tiempo) -->
+            <!-- 3. Panel de Episodios -->
             <div class="episode-block" id="episodeContainerBlock" style="display: none;">
                 <div class="episode-controls-row">
                     <select id="episodeSelect" class="episode-select" title="Seleccionar episodio">
-                        <!-- Las opciones se cargan automáticamente -->
                     </select>
                     <button id="episodePlayBtn" class="episode-play-btn" title="Reproducir / Pausar Episodio">
                         <i class="fa-solid fa-play" id="episodeIcon"></i>
@@ -583,10 +583,9 @@
     </div>
 
     <script>
-        // Carga de variables globales desde el config.js
         if (typeof CONFIG !== 'undefined') {
             document.getElementById('uiProgramName').innerText = CONFIG.nombrePrograma;
-            document.getElementById('uiHostSignature').innerText = CONFIG.conductor; // <-- Inyecta la firma desde el config
+            document.getElementById('uiHostSignature').innerText = CONFIG.conductor;
             document.getElementById('uiStationName').innerText = CONFIG.nombreEmisora;
             document.getElementById('uiStationSlogan').innerText = CONFIG.sloganEmisora;
             
@@ -636,7 +635,6 @@
             }
         }
 
-        // Horario dinámico conectado a diasPrograma del config.js
         function updateDynamicSchedule() {
             const scheduleElement = document.getElementById('dynamicScheduleText');
             
@@ -690,7 +688,6 @@
             }, 50); 
         }
 
-        // Control En Vivo
         playTrigger.addEventListener('click', () => {
             if (!isLiveAllowed && !isPlayingLive) {
                 alert("El programa 'Rincón Gaitero' solo está disponible en vivo en su horario programado.");
@@ -719,18 +716,21 @@
             }
         });
 
-        // Detección automática de episodios (.aac o .mp3)
+        // Búsqueda multiformato en la carpeta /episodios/ (.aac, .mp3, .m4a, .wav)
         async function detectAvailableEpisodes() {
             availableEpisodes = [];
+            const formatos = ['aac', 'mp3', 'm4a', 'wav'];
             
             for (let i = 50; i >= 1; i--) {
-                const nameAac = `episodio${i}.aac`;
-                const nameMp3 = `episodio${i}.mp3`;
-                
-                if (await checkFileExists(nameAac)) {
-                    availableEpisodes.push({ name: `Episodio ${i} (AAC)`, file: nameAac });
-                } else if (await checkFileExists(nameMp3)) {
-                    availableEpisodes.push({ name: `Episodio ${i}`, file: nameMp3 });
+                for (const ext of formatos) {
+                    const filePath = `episodios/episodio${i}.${ext}`;
+                    if (await checkFileExists(filePath)) {
+                        availableEpisodes.push({ 
+                            name: `Episodio ${i} (${ext.toUpperCase()})`, 
+                            file: filePath 
+                        });
+                        break; 
+                    }
                 }
             }
 
@@ -808,30 +808,54 @@
             return `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
         }
 
-        function loadGifsAutomatically() {
+        // Carga multiformato (.gif, .mp4, .webm) en la carpeta /gifs/
+        async function loadGifsAutomatically() {
             const container = document.getElementById('gifContainer');
             const totalGifs = 4;
-            let loadedImages = [];
+            const extensiones = ['gif', 'mp4', 'webm'];
+            let loadedMedia = [];
 
             for (let i = 1; i <= totalGifs; i++) {
-                loadedImages.push(`gif${i}.gif`);
+                let found = false;
+                for (const ext of extensiones) {
+                    const path = `gifs/gif${i}.${ext}`;
+                    if (await checkFileExists(path)) {
+                        loadedMedia.push({ path, type: ext });
+                        found = true;
+                        break;
+                    }
+                }
+                // Si no existe la carpeta /gifs/, intenta fallback en la raíz
+                if (!found) {
+                    loadedMedia.push({ path: `gif${i}.gif`, type: 'gif' });
+                }
             }
 
             container.innerHTML = '';
-            loadedImages.forEach((path, i) => {
-                const img = document.createElement('img');
-                img.src = path;
-                img.className = `gif-slide ${i === 0 ? 'active' : ''}`;
-                container.appendChild(img);
+            loadedMedia.forEach((media, i) => {
+                let element;
+                if (media.type === 'gif') {
+                    element = document.createElement('img');
+                    element.src = media.path;
+                } else {
+                    element = document.createElement('video');
+                    element.src = media.path;
+                    element.autoplay = true;
+                    element.loop = true;
+                    element.muted = true;
+                    element.playsInline = true;
+                }
+                element.className = `media-slide ${i === 0 ? 'active' : ''}`;
+                container.appendChild(element);
             });
 
-            if (loadedImages.length > 1) {
+            if (loadedMedia.length > 1) {
                 initDynamicGifRotator();
             }
         }
 
         function initDynamicGifRotator() {
-            const slides = document.querySelectorAll('.gif-slide');
+            const slides = document.querySelectorAll('.media-slide');
             let currentSlide = 0;
             setInterval(() => {
                 if (slides.length > 0) {
