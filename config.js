@@ -5,7 +5,7 @@ const CONFIG = {
     
     // Configuración del Horario del Programa En Vivo, Hora Militar:
    // Días múltiples de transmisión (Ej: Martes [2] y Jueves [4]: [2, 4])
-    diasPrograma: [0], 
+    diasProgramas: [0], 
     horaInicio: 16,         // 4:00 PM
     horaFin: 18,            // 6:00 PM
     
