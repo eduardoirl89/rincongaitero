@@ -113,7 +113,7 @@
             height: 100%;
         }
 
-        /* CLASE UNIFICADA PARA LAS ELIPSES */
+        /* ELIPSES GENERALES */
         .unified-ellipse {
             background: rgba(255, 0, 85, 0.15);
             backdrop-filter: blur(8px);
@@ -156,7 +156,7 @@
         /* 1. Cabecera */
         .header-container-relative {
             position: absolute;
-            top: 6%;
+            top: 5%;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
@@ -200,7 +200,7 @@
             left: 50%;
             transform: translateX(-50%);
             font-family: 'Great Vibes', cursive;
-            font-size: 1.05rem;
+            font-size: 1rem;
             color: #ffffff;
             font-weight: 400;
             text-shadow: 0 2px 5px rgba(0,0,0,0.9), 0 0 8px rgba(255,0,85,0.5);
@@ -209,27 +209,25 @@
             pointer-events: none;
         }
 
-        /* Firma: "con Eduardo Rincon" sobre el círculo */
         .host-signature {
             position: absolute;
             top: 20%;
             left: 50%;
             transform: translateX(-50%);
             font-family: 'Great Vibes', cursive;
-            font-size: 2.05rem;
+            font-size: 2.0rem;
             color: #ffffff;
             font-weight: 400;
             text-shadow: 0 2px 6px rgba(0,0,0,0.9), 0 0 10px rgba(255,0,85,0.6);
             white-space: nowrap;
             z-index: 15;
             pointer-events: none;
-            letter-spacing: 0.5px;
         }
 
         /* 2. Círculo Central */
         .center-stage {
             position: absolute;
-            top: 37%;
+            top: 35%;
             left: 50%;
             transform: translate(-50%, -50%);
             display: flex;
@@ -241,8 +239,8 @@
 
         .video-circle-container {
             position: relative;
-            width: 210px;
-            height: 210px;
+            width: 195px;
+            height: 195px;
             border-radius: 50%;
             padding: 4px;
             background: linear-gradient(135deg, rgba(255,0,85,0.8), rgba(160,32,240,0.8));
@@ -293,7 +291,7 @@
             color: #fff;
             padding: 3px 10px;
             border-radius: 20px;
-            font-size: 0.6rem;
+            font-size: 0.58rem;
             font-weight: 700;
             letter-spacing: 0.8px;
             border: 1px solid rgba(255,0,85,0.6);
@@ -310,22 +308,107 @@
             color: #ff0055;
         }
 
-        /* 3. Botón de Último Episodio (Debajo del círculo de GIF) */
+        /* 3. Panel de Episodios con Selector y Barra de Tiempo */
         .episode-block {
             position: absolute;
-            top: 52%;
+            top: 50%;
             left: 50%;
             transform: translateX(-50%);
-            width: 100%;
+            width: 82%;
+            max-width: 330px;
+            background: rgba(255, 0, 85, 0.12);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 0, 85, 0.4);
+            border-radius: 20px;
+            padding: 10px 15px;
+            z-index: 10;
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .episode-controls-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .episode-select {
+            background: rgba(13, 6, 20, 0.9);
+            color: #fff;
+            border: 1px solid rgba(255, 0, 85, 0.6);
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            outline: none;
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .episode-play-btn {
+            background: #ff0055;
+            color: #fff;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
             display: flex;
             justify-content: center;
-            z-index: 10;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(255,0,85,0.6);
+            transition: transform 0.2s;
+        }
+
+        .episode-play-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Barra para adelantar / barra de tiempo */
+        .progress-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .progress-bar::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff0055;
+            cursor: pointer;
+            box-shadow: 0 0 6px rgba(255,0,85,0.8);
+        }
+
+        .time-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.6rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 600;
         }
 
         /* 4. Emisora */
         .station-block {
             position: absolute;
-            top: 63%;
+            top: 66%;
             left: 50%;
             transform: translateX(-50%);
             width: 100%;
@@ -348,7 +431,7 @@
             left: 50%;
             transform: translateX(-50%);
             font-family: 'Great Vibes', cursive;
-            font-size: 1.05rem;
+            font-size: 1rem;
             color: #ffffff;
             font-weight: 400;
             text-shadow: 0 2px 5px rgba(0,0,0,0.9), 0 0 8px rgba(255,0,85,0.5);
@@ -360,7 +443,7 @@
         /* 5. Web oficial */
         .web-block {
             position: absolute;
-            top: 74%;
+            top: 76%;
             left: 50%;
             transform: translateX(-50%);
             width: 100%;
@@ -377,7 +460,7 @@
         /* 6. WhatsApp */
         .whatsapp-block {
             position: absolute;
-            top: 84%;
+            top: 85%;
             left: 50%;
             transform: translateX(-50%);
             z-index: 10;
@@ -385,8 +468,8 @@
 
         .whatsapp-trigger {
             background: #ff0055;
-            width: 38px;
-            height: 38px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             border: 2px solid rgba(255,255,255,0.8);
             display: flex;
@@ -405,7 +488,7 @@
 
         .whatsapp-trigger i {
             color: #fff;
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
     </style>
 </head>
@@ -414,14 +497,14 @@
     <!-- Archivo de configuración externo -->
     <script src="config.js"></script>
 
-    <!-- Audio de música de fondo automática -->
+    <!-- Audio de música de fondo -->
     <audio id="backgroundAudio" loop src="musica_fondo.mp3"></audio>
 
     <!-- Audio de Streaming en vivo -->
     <audio id="radioStream" preload="none"></audio>
 
-    <!-- Audio para el Último Episodio -->
-    <audio id="episodeStream" preload="none"></audio>
+    <!-- Audio para Episodios AAC / MP3 -->
+    <audio id="episodeStream" preload="metadata"></audio>
 
     <div class="wrapper">
         <div class="bg-glow-effect"></div>
@@ -446,7 +529,6 @@
                 </div>
             </div>
 
-            <!-- Firma sobre el círculo de los GIFs -->
             <div class="host-signature" id="uiHostSignature">con Eduardo Rincon</div>
 
             <!-- 2. Círculo Central Interactivo (Radio En Vivo) -->
@@ -459,12 +541,21 @@
                 </div>
             </div>
 
-            <!-- 3. Botón de Último Episodio (Aparece solo si hay un archivo disponible) -->
+            <!-- 3. Panel de Episodios (Selector + Play/Pause + Barra de Tiempo) -->
             <div class="episode-block" id="episodeContainerBlock" style="display: none;">
-                <div class="unified-ellipse" id="episodeTrigger" title="Reproducir último episodio">
-                    <div class="ellipse-text">
-                        <i class="fa-solid fa-play" id="episodeIcon" style="color: #ff0055; margin-right: 6px;"></i> 
-                        <span id="episodeLabel">ÚLTIMO EPISODIO</span>
+                <div class="episode-controls-row">
+                    <select id="episodeSelect" class="episode-select" title="Seleccionar episodio">
+                        <!-- Las opciones se cargan automáticamente -->
+                    </select>
+                    <button id="episodePlayBtn" class="episode-play-btn" title="Reproducir / Pausar Episodio">
+                        <i class="fa-solid fa-play" id="episodeIcon"></i>
+                    </button>
+                </div>
+                <div class="progress-container">
+                    <input type="range" id="progressBar" class="progress-bar" value="0" min="0" max="100" step="0.1">
+                    <div class="time-info">
+                        <span id="currentTime">00:00</span>
+                        <span id="durationTime">00:00</span>
                     </div>
                 </div>
             </div>
@@ -496,7 +587,6 @@
     </div>
 
     <script>
-        // Cargar los valores desde el archivo config.js
         if (typeof CONFIG !== 'undefined') {
             document.getElementById('uiProgramName').innerText = CONFIG.nombrePrograma;
             document.getElementById('uiHostSignature').innerText = CONFIG.conductor;
@@ -520,36 +610,39 @@
         const statusLabel = document.getElementById('statusLabel');
 
         const episodeContainerBlock = document.getElementById('episodeContainerBlock');
-        const episodeTrigger = document.getElementById('episodeTrigger');
+        const episodeSelect = document.getElementById('episodeSelect');
+        const episodePlayBtn = document.getElementById('episodePlayBtn');
         const episodeIcon = document.getElementById('episodeIcon');
-        const episodeLabel = document.getElementById('episodeLabel');
+        const progressBar = document.getElementById('progressBar');
+        const currentTimeEl = document.getElementById('currentTime');
+        const durationTimeEl = document.getElementById('durationTime');
 
         let isPlayingLive = false;
         let isPlayingEpisode = false;
         let isLiveAllowed = false;
+        let availableEpisodes = [];
 
-        // Verificar si el horario actual corresponde al programa en vivo
-        function checkLiveAvailability() {
-            if (typeof CONFIG === 'undefined') return;
+function checkLiveAvailability() {
+    if (typeof CONFIG === 'undefined') return;
+    const now = new Date();
+    const currentDay = now.getDay();
+    const currentHour = now.getHours();
 
-            const now = new Date();
-            const currentDay = now.getDay();
-            const currentHour = now.getHours();
+    // Comprueba si el día de hoy está incluido en la lista de días del config.js
+    const esDiaDePrograma = CONFIG.diasPrograma.includes(currentDay);
 
-            // Compara si es el día configurado y se encuentra dentro de las horas de inicio y fin
-            if (currentDay === CONFIG.diaPrograma && currentHour >= CONFIG.horaInicio && currentHour < CONFIG.horaFin) {
-                isLiveAllowed = true;
-                statusLabel.innerText = "TOCA PARA ESCUCHAR";
-            } else {
-                isLiveAllowed = false;
-                statusLabel.innerText = "FUERA DE AIRE";
-            }
-        }
+    if (esDiaDePrograma && currentHour >= CONFIG.horaInicio && currentHour < CONFIG.horaFin) {
+        isLiveAllowed = true;
+        statusLabel.innerText = "TOCA PARA ESCUCHAR";
+    } else {
+        isLiveAllowed = false;
+        statusLabel.innerText = "FUERA DE AIRE";
+    }
+}
 
-        // 1. Música de fondo automática al abrir la web
         window.addEventListener('load', () => {
             checkLiveAvailability();
-            checkForLatestEpisode();
+            detectAvailableEpisodes();
 
             bgAudio.volume = 0.5;
             bgAudio.play().catch(() => {
@@ -563,7 +656,6 @@
             });
         });
 
-        // Desvanecimiento de la música de fondo
         function fadeOutBackground() {
             let fadeTimer = setInterval(() => {
                 if (bgAudio.volume > 0.05) {
@@ -576,34 +668,27 @@
             }, 50); 
         }
 
-        // 2. Control del botón principal (Radio en Vivo)
+        // Control En Vivo
         playTrigger.addEventListener('click', () => {
-            // Validar si está en el horario permitido del config
             if (!isLiveAllowed && !isPlayingLive) {
                 alert("El programa 'Rincón Gaitero' solo está disponible en vivo en su horario programado.");
                 return;
             }
 
             if (!isPlayingLive) {
-                // Si el episodio estaba sonando, lo pausamos
                 if (isPlayingEpisode) {
                     episodeStream.pause();
                     isPlayingEpisode = false;
                     episodeIcon.className = "fa-solid fa-play";
-                    episodeLabel.innerText = "ÚLTIMO EPISODIO";
                 }
 
-                if (!bgAudio.paused) {
-                    fadeOutBackground();
-                }
+                if (!bgAudio.paused) fadeOutBackground();
 
                 audioStream.play().then(() => {
                     isPlayingLive = true;
                     playIcon.className = "fa-solid fa-stop"; 
                     statusLabel.innerText = "EN VIVO";
-                }).catch(error => {
-                    console.log("Error al reproducir streaming:", error);
-                });
+                }).catch(err => console.log(err));
             } else {
                 audioStream.pause();
                 isPlayingLive = false;
@@ -612,24 +697,33 @@
             }
         });
 
-        // 3. Búsqueda automática del archivo de episodio más reciente disponible
-        async function checkForLatestEpisode() {
-            // Verificamos patrones comunes: episodio100 al 1, o formatos con fechas de ejemplo
-            // Probamos archivos numerados del 1 al 50 en orden descendente para hallar el más reciente
-            let foundEpisode = null;
-
+        // Detección automática de episodios (.aac o .mp3)
+        async function detectAvailableEpisodes() {
+            availableEpisodes = [];
+            
+            // Revisamos del 1 al 50 probando .aac y .mp3
             for (let i = 50; i >= 1; i--) {
-                const fileName = `episodio${i}.mp3`;
-                if (await checkFileExists(fileName)) {
-                    foundEpisode = fileName;
-                    break;
+                const nameAac = `episodio${i}.aac`;
+                const nameMp3 = `episodio${i}.mp3`;
+                
+                if (await checkFileExists(nameAac)) {
+                    availableEpisodes.push({ name: `Episodio ${i} (AAC)`, file: nameAac });
+                } else if (await checkFileExists(nameMp3)) {
+                    availableEpisodes.push({ name: `Episodio ${i}`, file: nameMp3 });
                 }
             }
 
-            // Si encuentra un episodio, configura el reproductor y muestra el botón
-            if (foundEpisode) {
-                episodeStream.src = foundEpisode;
+            if (availableEpisodes.length > 0) {
                 episodeContainerBlock.style.display = "flex";
+                episodeSelect.innerHTML = "";
+                availableEpisodes.forEach(ep => {
+                    const option = document.createElement('option');
+                    option.value = ep.file;
+                    option.textContent = ep.name;
+                    episodeSelect.appendChild(option);
+                });
+                // Cargar el primero de la lista por defecto
+                episodeStream.src = availableEpisodes[0].file;
             }
         }
 
@@ -643,10 +737,17 @@
             });
         }
 
-        // Control al hacer clic en el botón de Último Episodio
-        episodeTrigger.addEventListener('click', () => {
+        // Al cambiar de episodio en el menú desplegable
+        episodeSelect.addEventListener('change', (e) => {
+            episodeStream.src = e.target.value;
+            if (isPlayingEpisode) {
+                episodeStream.play();
+            }
+        });
+
+        // Play / Pause de Episodio
+        episodePlayBtn.addEventListener('click', () => {
             if (!isPlayingEpisode) {
-                // Si la radio en vivo estaba sonando, la pausamos
                 if (isPlayingLive) {
                     audioStream.pause();
                     isPlayingLive = false;
@@ -654,30 +755,47 @@
                     statusLabel.innerText = isLiveAllowed ? "TOCA PARA ESCUCHAR" : "FUERA DE AIRE";
                 }
 
-                if (!bgAudio.paused) {
-                    fadeOutBackground();
-                }
+                if (!bgAudio.paused) fadeOutBackground();
 
                 episodeStream.play().then(() => {
                     isPlayingEpisode = true;
                     episodeIcon.className = "fa-solid fa-stop";
-                    episodeLabel.innerText = "REPRODUCIENDO EPISODIO";
-                }).catch(error => {
-                    console.log("Error al reproducir episodio:", error);
-                });
+                }).catch(err => console.log(err));
             } else {
                 episodeStream.pause();
                 isPlayingEpisode = false;
                 episodeIcon.className = "fa-solid fa-play";
-                episodeLabel.innerText = "ÚLTIMO EPISODIO";
             }
         });
 
-        // 4. Carga y rotación de GIFs
-     // Carga directa de los GIFs disponibles (gif1.gif hasta gif4.gif)
+        // Actualizar barra de tiempo mientras se reproduce el episodio
+        episodeStream.addEventListener('timeupdate', () => {
+            if (!isNaN(episodeStream.duration)) {
+                const progress = (episodeStream.currentTime / episodeStream.duration) * 100;
+                progressBar.value = progress;
+                currentTimeEl.textContent = formatTime(episodeStream.currentTime);
+                durationTimeEl.textContent = formatTime(episodeStream.duration);
+            }
+        });
+
+        // Adelantar o retroceder al mover la barra manualmente
+        progressBar.addEventListener('input', () => {
+            if (!isNaN(episodeStream.duration)) {
+                const seekTime = (progressBar.value / 100) * episodeStream.duration;
+                episodeStream.currentTime = seekTime;
+            }
+        });
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        // Carga de GIFs (4 fijos)
         function loadGifsAutomatically() {
             const container = document.getElementById('gifContainer');
-            const totalGifs = 4; // Tienes 4 GIFs subidos en tu repositorio
+            const totalGifs = 4;
             let loadedImages = [];
 
             for (let i = 1; i <= totalGifs; i++) {
@@ -689,7 +807,6 @@
                 const img = document.createElement('img');
                 img.src = path;
                 img.className = `gif-slide ${i === 0 ? 'active' : ''}`;
-                img.alt = `Animación ${i + 1}`;
                 container.appendChild(img);
             });
 
@@ -701,43 +818,15 @@
         function initDynamicGifRotator() {
             const slides = document.querySelectorAll('.gif-slide');
             let currentSlide = 0;
-            const slideDuration = 2500; // Cambia de GIF cada 2.5 segundos
-
             setInterval(() => {
                 if (slides.length > 0) {
                     slides[currentSlide].classList.remove('active');
                     currentSlide = (currentSlide + 1) % slides.length;
                     slides[currentSlide].classList.add('active');
                 }
-            }, slideDuration);
+            }, 2500);
         }
 
-        // 5. Horario dinámico en la cabecera
-        function updateDynamicSchedule() {
-            const scheduleElement = document.getElementById('dynamicScheduleText');
-            if (typeof CONFIG === 'undefined') return;
-
-            const targetDay = CONFIG.diaPrograma; 
-            const timeString = `de ${CONFIG.textoHoraInicio} a ${CONFIG.textoHoraFin}`;
-
-            const now = new Date();
-            const currentDay = now.getDay(); 
-
-            const nombresDias = ["domingos", "lunes", "martes", "miércoles", "jueves", "viernes", "sábados"];
-            const nombreDiaSingular = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"][targetDay];
-
-            let diffDays = targetDay - currentDay;
-
-            if (diffDays === 0) {
-                scheduleElement.innerText = `hoy ${timeString}`;
-            } else if (diffDays === 1 || diffDays === -6) {
-                scheduleElement.innerText = `mañana ${nombreDiaSingular} ${timeString}`;
-            } else {
-                scheduleElement.innerText = `${nombresDias[targetDay]} ${timeString}`;
-            }
-        }
-
-        updateDynamicSchedule();
         loadGifsAutomatically();
     </script>
 </body>
