@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rincón Gaitero - En Vivo</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Great+Vibes&display=swap" rel="stylesheet">
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100vh;
+            background-color: #0d0614;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 430px;
+            height: 100vh;
+            max-height: 932px;
+            background: linear-gradient(135deg, #12071f, #07030c);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 0 40px rgba(0,0,0,0.8);
+        }
+
+        /* Fondo y degradados */
+        .bg-glow-effect {
+            position: absolute;
+            bottom: 25%;
+            left: 0;
+            width: 100%;
+            height: 120px;
+            background: radial-gradient(ellipse at center, rgba(160, 32, 240, 0.25) 0%, rgba(255, 0, 85, 0.15) 50%, transparent 70%);
+            z-index: 1;
+            pointer-events: none;
+            animation: pulseGlow 4s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { opacity: 0.4; transform: scale(0.95); }
+            100% { opacity: 0.8; transform: scale(1.05); }
+        }
+
+        /* Tipografía gigante de fondo */
+        .bg-typography {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .bg-line {
+            font-size: 7.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -3px;
+            white-space: nowrap;
+            display: inline-block;
+            animation: serpentWave 8s ease-in-out infinite alternate;
+        }
+
+        .bg-line:nth-child(1) { opacity: 0.03; animation-name: serpentWave1; animation-duration: 7s; }
+        .bg-line:nth-child(2) { opacity: 0.06; animation-name: serpentWave2; animation-duration: 9s; }
+        .bg-line:nth-child(3) { opacity: 0.11; animation-name: serpentWave1; animation-duration: 6s; }
+        .bg-line:nth-child(4) { opacity: 0.18; animation-name: serpentWave2; animation-duration: 8s; }
+
+        @keyframes serpentWave1 {
+            0% { transform: translateX(-40px) skewX(-10deg); }
+            50% { transform: translateX(40px) skewX(10deg); }
+            100% { transform: translateX(-40px) skewX(-10deg); }
+        }
+
+        @keyframes serpentWave2 {
+            0% { transform: translateX(40px) skewX(10deg); }
+            50% { transform: translateX(-40px) skewX(-10deg); }
+            100% { transform: translateX(40px) skewX(10deg); }
+        }
+
+        .bg-line.dark { color: #888; }
+        .bg-line.light { color: #fff; }
+
+        /* Capa superior interactiva */
+        .content-layer {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* CLASE ÚNICA Y UNIFICADA PARA LAS TRES ELIPSES */
+        .unified-ellipse {
+            background: rgba(255, 0, 85, 0.15);
+            backdrop-filter: blur(8px);
+            width: 82%;
+            max-width: 330px;
+            height: 44px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 40px;
+            text-align: center;
+            border: 2px solid rgba(255, 0, 85, 0.4);
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.2), inset 0 0 10px rgba(160, 32, 240, 0.2);
+            animation: softGlow 3s infinite alternate;
+            box-sizing: border-box;
+            text-decoration: none;
+        }
+
+        @keyframes softGlow {
+            0% { border-color: rgba(255, 0, 85, 0.3); box-shadow: 0 0 10px rgba(255, 0, 85, 0.2); }
+            100% { border-color: rgba(160, 32, 240, 0.7); box-shadow: 0 0 25px rgba(160, 32, 240, 0.4); }
+        }
+
+        .ellipse-text {
+            color: #fff;
+            font-weight: 900;
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            text-transform: uppercase;
+        }
+
+        /* 1. Cabecera (Rincón Gaitero) */
+        .header-container-relative {
+            position: absolute;
+            top: 8%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 10;
+            width: 100%;
+        }
+
+        .header-box-wrapper {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 82%;
+            max-width: 330px;
+        }
+
+        .cuatro-inline {
+            position: absolute;
+            left: 15px;
+            top: -25px;
+            width: 85px;
+            height: 85px;
+            object-fit: contain;
+            opacity: 0.85;
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.8));
+            animation: shakeCuatro 1.8s infinite ease-in-out;
+            z-index: 15;
+            pointer-events: none;
+        }
+
+        @keyframes shakeCuatro {
+            0%, 100% { transform: rotate(-5deg) scale(1); }
+            50% { transform: rotate(5deg) scale(1.08); }
+        }
+
+        .dynamic-signature-schedule {
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Great Vibes', cursive;
+            font-size: 1.15rem;
+            color: #ffffff;
+            font-weight: 400;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.9), 0 0 8px rgba(255,0,85,0.5);
+            white-space: nowrap;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* 2. Círculo del GIF (interactivo para reproducir la radio al hacer clic) */
+        .center-stage {
+            position: absolute;
+            top: 38%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            cursor: pointer;
+        }
+
+        .video-circle-container {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            padding: 5px;
+            background: linear-gradient(135deg, rgba(255,0,85,0.8), rgba(160,32,240,0.8));
+            box-shadow: 0 0 35px rgba(255, 0, 85, 0.5);
+            animation: borderPulse 3s infinite alternate;
+            transition: transform 0.2s ease;
+        }
+
+        .center-stage:hover .video-circle-container {
+            transform: scale(1.03);
+        }
+
+        @keyframes borderPulse {
+            0% { box-shadow: 0 0 20px rgba(255, 0, 85, 0.4); transform: scale(0.98); }
+            100% { box-shadow: 0 0 45px rgba(160, 32, 240, 0.8); transform: scale(1.02); }
+        }
+
+        .video-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            overflow: hidden;
+            background: #000;
+            position: relative;
+        }
+
+        .gif-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        .gif-slide.active {
+            opacity: 1;
+        }
+
+        /* Indicador de reproducción flotante sobre el círculo */
+        .play-indicator {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.75);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            border: 1px solid rgba(255,0,85,0.6);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            z-index: 20;
+            pointer-events: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.8);
+        }
+
+        .play-indicator i {
+            color: #ff0055;
+        }
+
+        /* Espectro de sonido */
+        .bg-equalizer-gradient {
+            position: absolute;
+            top: 48%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 82%;
+            max-width: 330px;
+            height: 45px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            z-index: 2;
+            opacity: 0.45;
+            pointer-events: none;
+            -webkit-mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
+            mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
+        }
+
+        .eq-bar-g {
+            flex: 1;
+            margin: 0 2px;
+            background: linear-gradient(to top, rgba(255,0,85,0.2), rgba(160,32,240,0.8));
+            border-radius: 3px;
+            animation: eqBounceGrad 1.2s ease-in-out infinite alternate;
+        }
+
+        .eq-bar-g:nth-child(odd) { animation-duration: 0.7s; }
+        .eq-bar-g:nth-child(even) { animation-duration: 1.3s; }
+
+        @keyframes eqBounceGrad {
+            0% { height: 8px; }
+            100% { height: 35px; }
+        }
+
+        /* 4. Bloque Emisora + Slogan */
+        .station-block {
+            position: absolute;
+            top: 65%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .station-container-relative {
+            position: relative;
+            width: 82%;
+            max-width: 330px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .signature-slogan {
+            position: absolute;
+            bottom: -13px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Great Vibes', cursive;
+            font-size: 1.15rem;
+            color: #ffffff;
+            font-weight: 400;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.9), 0 0 8px rgba(255,0,85,0.5);
+            white-space: nowrap;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* 5. Link Web Oficial */
+        .web-block {
+            position: absolute;
+            top: 77%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .web-ellipse {
+            font-size: 0.75rem;
+            letter-spacing: 1.2px;
+            transition: all 0.3s ease;
+        }
+
+        .web-ellipse:hover {
+            background: rgba(255, 0, 85, 0.3);
+            transform: scale(1.02);
+        }
+
+        /* 6. Botón de WhatsApp */
+        .whatsapp-block {
+            position: absolute;
+            top: 90%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+
+        .whatsapp-trigger {
+            background: #ff0055;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255,0,85,0.8);
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .whatsapp-trigger:hover {
+            transform: scale(1.12);
+            background: #25d366;
+        }
+
+        .whatsapp-trigger i {
+            color: #fff;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Reproductor de Audio en Streaming para la Radio -->
+    <audio id="radioStream" preload="none" src="https://sonic.instanet.tv:9446/stream"></audio>
+
+    <div class="wrapper">
+        <!-- Fondo animado -->
+        <div class="bg-glow-effect"></div>
+
+        <div class="bg-typography">
+            <div class="bg-line light">EN</div>
+            <div class="bg-line dark">VIVO</div>
+            <div class="bg-line dark">VIVO</div>
+            <div class="bg-line light">VIVO</div>
+        </div>
+
+        <div class="content-layer">
+            <!-- 1. Insignia Superior ("Rincón Gaitero") -->
+            <div class="header-container-relative">
+                <div class="header-box-wrapper">
+                    <!-- Cuatro flotando a la izquierda -->
+                    <img src="cuatro.png" alt="Cuatro" class="cuatro-inline" onerror="this.style.display='none'">
+                    
+                    <div class="unified-ellipse">
+                        <div class="ellipse-text">RINCON GAITERO</div>
+                    </div>
+                    <div class="dynamic-signature-schedule" id="dynamicScheduleText">domingos de 4pm a 6pm</div>
+                </div>
+            </div>
+
+            <!-- 2. Círculo del GIF (Interactivo: Clic para reproducir/pausar la radio en vivo) -->
+            <div class="center-stage" id="playTrigger" title="Toca para reproducir / pausar en vivo">
+                <div class="video-circle-container">
+                    <div class="video-circle" id="gifContainer"></div>
+                    <div class="play-indicator" id="playStatusText">
+                        <i class="fa-solid fa-play" id="playIcon"></i> <span id="statusLabel">TOCA PARA ESCUCHAR</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Espectro de sonido -->
+            <div class="bg-equalizer-gradient">
+                <div class="eq-bar-g" style="height: 15px;"></div>
+                <div class="eq-bar-g" style="height: 30px;"></div>
+                <div class="eq-bar-g" style="height: 10px;"></div>
+                <div class="eq-bar-g" style="height: 35px;"></div>
+                <div class="eq-bar-g" style="height: 20px;"></div>
+                <div class="eq-bar-g" style="height: 32px;"></div>
+                <div class="eq-bar-g" style="height: 15px;"></div>
+                <div class="eq-bar-g" style="height: 25px;"></div>
+                <div class="eq-bar-g" style="height: 10px;"></div>
+            </div>
+
+            <!-- 4. Bloque Emisora + Slogan -->
+            <div class="station-block">
+                <div class="station-container-relative">
+                    <div class="unified-ellipse">
+                        <div class="ellipse-text">ONDA 103.5 FM</div>
+                    </div>
+                    <div class="signature-slogan">La Super Estación</div>
+                </div>
+            </div>
+
+            <!-- 5. Link Web Oficial -->
+            <div class="web-block">
+                <a href="https://www.ondaciudadbolivar.com" target="_blank" class="unified-ellipse web-ellipse">
+                    <div class="ellipse-text" style="font-size: 0.75rem;">WWW.ONDACIUDADBOLIVAR.COM</div>
+                </a>
+            </div>
+
+            <!-- 6. Botón WhatsApp -->
+            <div class="whatsapp-block">
+                <a href="https://wa.me/TU_NUMERO_AQUI?text=Hola,%20sintonizo%20Rincón%20Gaitero" target="_blank" class="whatsapp-trigger" title="Escríbenos por WhatsApp">
+                    <i class="fa-brands fa-whatsapp"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // A. Control del reproductor de streaming de audio
+        const audioStream = document.getElementById('radioStream');
+        const playTrigger = document.getElementById('playTrigger');
+        const playIcon = document.getElementById('playIcon');
+        const statusLabel = document.getElementById('statusLabel');
+        let isPlaying = false;
+
+        playTrigger.addEventListener('click', () => {
+            if (!isPlaying) {
+                audioStream.play().then(() => {
+                    isPlaying = true;
+                    playIcon.className = "fa-solid fa-pause";
+                    statusLabel.innerText = "EN VIVO";
+                }).catch(error => {
+                    console.log("Error al reproducir audio:", error);
+                });
+            } else {
+                audioStream.pause();
+                isPlaying = false;
+                playIcon.className = "fa-solid fa-play";
+                statusLabel.innerText = "PAUSADO";
+            }
+        });
+
+        // B. Carga automática y rotación de GIFs con fundido a la mitad de su duración
+        async function loadGifsAutomatically() {
+            const container = document.getElementById('gifContainer');
+            let index = 1;
+            let loadedImages = [];
+
+            while (index <= 20) {
+                const gifPath = `gif${index}.gif`;
+                const exists = await checkImageExists(gifPath);
+                if (exists) {
+                    loadedImages.push(gifPath);
+                    index++;
+                } else {
+                    break;
+                }
+            }
+
+            if (loadedImages.length === 0) {
+                loadedImages.push('gif1.gif');
+            }
+
+            container.innerHTML = '';
+            loadedImages.forEach((path, i) => {
+                const img = document.createElement('img');
+                img.src = path;
+                img.className = `gif-slide ${i === 0 ? 'active' : ''}`;
+                img.alt = `Animación ${i + 1}`;
+                container.appendChild(img);
+            });
+
+            if (loadedImages.length > 1) {
+                initDynamicGifRotator();
+            }
+        }
+
+        function checkImageExists(url) {
+            return new Promise(resolve => {
+                const img = new Image();
+                img.onload = () => resolve(true);
+                img.onerror = () => resolve(false);
+                img.src = url;
+            });
+        }
+
+        function initDynamicGifRotator() {
+            const slides = document.querySelectorAll('.gif-slide');
+            let currentSlide = 0;
+            const slideDuration = 2500; 
+
+            setInterval(() => {
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.add('active');
+            }, slideDuration);
+        }
+
+        function updateDynamicSchedule() {
+            const now = new Date();
+            const dayOfWeek = now.getDay(); 
+            const scheduleElement = document.getElementById('dynamicScheduleText');
+
+            if (dayOfWeek === 0) {
+                scheduleElement.innerText = "hoy de 4pm a 6pm";
+            } else if (dayOfWeek === 6) {
+                scheduleElement.innerText = "mañana domingo de 4pm a 6pm";
+            } else {
+                scheduleElement.innerText = "próximo domingo de 4pm a 6pm";
+            }
+        }
+
+        updateDynamicSchedule();
+        loadGifsAutomatically();
+    </script>
+</body>
+</html>
