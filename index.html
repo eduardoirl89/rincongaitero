@@ -367,7 +367,6 @@
             transform: scale(1.1);
         }
 
-        /* Barra para adelantar / barra de tiempo */
         .progress-container {
             width: 100%;
             display: flex;
@@ -497,13 +496,9 @@
     <!-- Archivo de configuración externo -->
     <script src="config.js"></script>
 
-    <!-- Audio de música de fondo -->
+    <!-- Audios -->
     <audio id="backgroundAudio" loop src="musica_fondo.mp3"></audio>
-
-    <!-- Audio de Streaming en vivo -->
     <audio id="radioStream" preload="none"></audio>
-
-    <!-- Audio para Episodios AAC / MP3 -->
     <audio id="episodeStream" preload="metadata"></audio>
 
     <div class="wrapper">
@@ -529,6 +524,7 @@
                 </div>
             </div>
 
+            <!-- Firma del conductor inyectada desde config.js -->
             <div class="host-signature" id="uiHostSignature">con Eduardo Rincon</div>
 
             <!-- 2. Círculo Central Interactivo (Radio En Vivo) -->
@@ -587,9 +583,10 @@
     </div>
 
     <script>
+        // Carga de variables globales desde el config.js
         if (typeof CONFIG !== 'undefined') {
             document.getElementById('uiProgramName').innerText = CONFIG.nombrePrograma;
-            document.getElementById('uiHostSignature').innerText = CONFIG.conductor;
+            document.getElementById('uiHostSignature').innerText = CONFIG.conductor; // <-- Inyecta la firma desde el config
             document.getElementById('uiStationName').innerText = CONFIG.nombreEmisora;
             document.getElementById('uiStationSlogan').innerText = CONFIG.sloganEmisora;
             
@@ -622,25 +619,50 @@
         let isLiveAllowed = false;
         let availableEpisodes = [];
 
-function checkLiveAvailability() {
-    if (typeof CONFIG === 'undefined') return;
-    const now = new Date();
-    const currentDay = now.getDay();
-    const currentHour = now.getHours();
+        function checkLiveAvailability() {
+            if (typeof CONFIG === 'undefined') return;
+            const now = new Date();
+            const currentDay = now.getDay();
+            const currentHour = now.getHours();
 
-    // Comprueba si el día de hoy está incluido en la lista de días del config.js
-    const esDiaDePrograma = CONFIG.diasPrograma.includes(currentDay);
+            const esDiaDePrograma = CONFIG.diasPrograma.includes(currentDay);
 
-    if (esDiaDePrograma && currentHour >= CONFIG.horaInicio && currentHour < CONFIG.horaFin) {
-        isLiveAllowed = true;
-        statusLabel.innerText = "TOCA PARA ESCUCHAR";
-    } else {
-        isLiveAllowed = false;
-        statusLabel.innerText = "FUERA DE AIRE";
-    }
-}
+            if (esDiaDePrograma && currentHour >= CONFIG.horaInicio && currentHour < CONFIG.horaFin) {
+                isLiveAllowed = true;
+                statusLabel.innerText = "TOCA PARA ESCUCHAR";
+            } else {
+                isLiveAllowed = false;
+                statusLabel.innerText = "FUERA DE AIRE";
+            }
+        }
+
+        // Horario dinámico conectado a diasPrograma del config.js
+        function updateDynamicSchedule() {
+            const scheduleElement = document.getElementById('dynamicScheduleText');
+            
+            if (typeof CONFIG === 'undefined') {
+                scheduleElement.innerText = "domingos de 4 pm a 6 pm";
+                return;
+            }
+
+            const dias = CONFIG.diasPrograma; 
+            const timeString = `de ${CONFIG.textoHoraInicio} a ${CONFIG.textoHoraFin}`;
+
+            const now = new Date();
+            const currentDay = now.getDay(); 
+
+            const nombresDiasSingular = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+            
+            if (dias.includes(currentDay)) {
+                scheduleElement.innerText = `hoy ${timeString}`;
+            } else {
+                let proxDia = dias[0];
+                scheduleElement.innerText = `próximo ${nombresDiasSingular[proxDia]} ${timeString}`;
+            }
+        }
 
         window.addEventListener('load', () => {
+            updateDynamicSchedule();
             checkLiveAvailability();
             detectAvailableEpisodes();
 
@@ -701,7 +723,6 @@ function checkLiveAvailability() {
         async function detectAvailableEpisodes() {
             availableEpisodes = [];
             
-            // Revisamos del 1 al 50 probando .aac y .mp3
             for (let i = 50; i >= 1; i--) {
                 const nameAac = `episodio${i}.aac`;
                 const nameMp3 = `episodio${i}.mp3`;
@@ -722,7 +743,6 @@ function checkLiveAvailability() {
                     option.textContent = ep.name;
                     episodeSelect.appendChild(option);
                 });
-                // Cargar el primero de la lista por defecto
                 episodeStream.src = availableEpisodes[0].file;
             }
         }
@@ -737,7 +757,6 @@ function checkLiveAvailability() {
             });
         }
 
-        // Al cambiar de episodio en el menú desplegable
         episodeSelect.addEventListener('change', (e) => {
             episodeStream.src = e.target.value;
             if (isPlayingEpisode) {
@@ -745,7 +764,6 @@ function checkLiveAvailability() {
             }
         });
 
-        // Play / Pause de Episodio
         episodePlayBtn.addEventListener('click', () => {
             if (!isPlayingEpisode) {
                 if (isPlayingLive) {
@@ -768,7 +786,6 @@ function checkLiveAvailability() {
             }
         });
 
-        // Actualizar barra de tiempo mientras se reproduce el episodio
         episodeStream.addEventListener('timeupdate', () => {
             if (!isNaN(episodeStream.duration)) {
                 const progress = (episodeStream.currentTime / episodeStream.duration) * 100;
@@ -778,7 +795,6 @@ function checkLiveAvailability() {
             }
         });
 
-        // Adelantar o retroceder al mover la barra manualmente
         progressBar.addEventListener('input', () => {
             if (!isNaN(episodeStream.duration)) {
                 const seekTime = (progressBar.value / 100) * episodeStream.duration;
@@ -792,7 +808,6 @@ function checkLiveAvailability() {
             return `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
         }
 
-        // Carga de GIFs (4 fijos)
         function loadGifsAutomatically() {
             const container = document.getElementById('gifContainer');
             const totalGifs = 4;
