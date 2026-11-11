@@ -4,9 +4,9 @@ const CONFIG = {
     conductor: "con Eduardo Rincon",
     
     // Configuración del Horario del Programa En Vivo:
-    diaPrograma: 0,         // 0 = Domingo, 1 = Lunes, 2 = Martes, etc.
-    horaInicio: 16,         // Hora militar de inicio (Ej: 16 para las 4:00 PM)
-    horaFin: 18,            // Hora militar de fin (Ej: 18 para las 6:00 PM)
+    diaPrograma: 3,         // 0 = Domingo, 1 = Lunes, 2 = Martes, etc.
+    horaInicio: 15,         // Hora militar de inicio (Ej: 16 para las 4:00 PM)
+    horaFin: 17,            // Hora militar de fin (Ej: 18 para las 6:00 PM)
     
     // Textos visibles del horario
     textoHoraInicio: "4 pm",
