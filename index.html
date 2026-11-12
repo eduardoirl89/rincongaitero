@@ -274,11 +274,16 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            opacity: 1;
+        }
+
+        /* La transición y opacidad variable solo aplican si hay rotación multislide */
+        .has-rotation .media-slide {
             opacity: 0;
             transition: opacity 1.5s ease-in-out;
         }
 
-        .media-slide.active {
+        .has-rotation .media-slide.active {
             opacity: 1;
         }
 
@@ -346,14 +351,13 @@
             font-weight: 700;
             outline: none;
             flex: 1;
-            min-width: 0; /* Vital para que flexbox permita truncar el texto */
+            min-width: 0;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
             cursor: pointer;
         }
 
-        /* Opciones del selector estilizadas para truncar nombres largos en móviles */
         .episode-select option {
             background: #12071f;
             color: #fff;
@@ -372,7 +376,7 @@
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            flex-shrink: 0; /* Evita que el botón se aplaste o deforme */
+            flex-shrink: 0;
             box-shadow: 0 2px 8px rgba(255,0,85,0.6);
             transition: transform 0.2s;
         }
@@ -783,7 +787,6 @@
             episodeStream.src = e.target.value;
             episodeStream.preload = "none"; 
             
-            // Si estaba sonando y cambia de opción, reproduce el nuevo y asegura el icono activo
             if (isPlayingEpisode) {
                 episodeStream.play().catch(err => console.log(err));
                 episodeIcon.className = "fa-solid fa-stop";
@@ -805,16 +808,15 @@
 
                 episodeStream.play().then(() => {
                     isPlayingEpisode = true;
-                    episodeIcon.className = "fa-solid fa-stop"; // Cambia dinámicamente a Stop/Pause
+                    episodeIcon.className = "fa-solid fa-stop";
                 }).catch(err => console.log(err));
             } else {
                 episodeStream.pause();
                 isPlayingEpisode = false;
-                episodeIcon.className = "fa-solid fa-play"; // Vuelve a Play
+                episodeIcon.className = "fa-solid fa-play";
             }
         });
 
-        // Asegurar que si el audio termina solo, el botón regrese al icono de Play
         episodeStream.addEventListener('ended', () => {
             isPlayingEpisode = false;
             episodeIcon.className = "fa-solid fa-play";
@@ -876,6 +878,14 @@
             }
 
             container.innerHTML = '';
+            
+            // Gestionar clase condicional de rotación según la cantidad de elementos
+            if (loadedMedia.length > 1) {
+                container.classList.add('has-rotation');
+            } else {
+                container.classList.remove('has-rotation');
+            }
+
             loadedMedia.forEach((media, i) => {
                 let element;
                 if (media.type === 'gif') {
