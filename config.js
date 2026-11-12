@@ -13,7 +13,7 @@ const CONFIG = {
     textoHoraFin: "6 pm",
 
     nombreEmisora: "ONDA 103.5 FM",
-    sloganEmisora: "La Super Estación",
+    sloganEmisora: ""La Superestación"",
     
     // Web Oficial y su texto visible:
     urlWebEmisora: "https://www.ondaciudadbolivar.com",
