@@ -1,7 +1,7 @@
 
 const CONFIG = {
-    nombrePrograma: "RINCÓN GAITERO",
-    conductor: "con Eduardo Rincon",
+    nombrePrograma: "RINCON GAITERO",
+    conductor: "con Eduardo Rincón",
     
     // Configuración del Horario del Programa En Vivo, Hora Militar:
    // Días múltiples de transmisión (Ej: Martes [2] y Jueves [4]: [2, 4])
@@ -13,7 +13,7 @@ const CONFIG = {
     textoHoraFin: "6 pm",
 
     nombreEmisora: "ONDA 103.5 FM",
-    sloganEmisora: ""La Superestación"",
+    sloganEmisora: "La Superestación",
     
     // Web Oficial y su texto visible:
     urlWebEmisora: "https://www.ondaciudadbolivar.com",
