@@ -4,7 +4,7 @@
     { "name": "🎙️ Episodio Muestra 2", "file": "episodios/episodio2.mp3" }
   ],
   "canciones": [
-    { "name": "🎵 Gaita Zuliana - Estrellas del Zulia", "file": "Estrellas_del_Zulia_Gaita_Zuliana.mp3" },
+    { "name": "🎵 Gaita Zuliana - Estrellas del Zulia", "file": "canciones/Estrellas_del_Zulia_Gaita_Zuliana.mp3" },
     { "name": "🎵 La Grey Venezolana - Ricardo Aguirre", "file": "canciones/la_grey.mp3" }
   ]
 }
