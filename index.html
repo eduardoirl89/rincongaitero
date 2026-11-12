@@ -551,7 +551,7 @@
                 </div>
             </div>
 
-            <!-- 3. Panel de Episodios y Canciones -->
+            <!-- 3. Panel de Episodios y Canciones (Carga automática con lista.json) -->
             <div class="episode-block" id="episodeContainerBlock">
                 <div class="episode-controls-row">
                     <select id="episodeSelect" class="episode-select" title="Seleccionar contenido">
@@ -730,75 +730,50 @@
             }
         });
 
-        // Detección ultrarrápida y progresiva de Episodios y Canciones
+        // Lectura automática y dinámica desde lista.json con nombres personalizados
         async function detectAvailableEpisodes() {
             availableEpisodes = [];
-            const formatos = ['mp3', 'aac', 'm4a', 'wav'];
-            
             episodeSelect.innerHTML = '<option value="" disabled selected>🎧 Cargando contenidos...</option>';
 
-            // 1. Buscar Episodios en /episodios/ (Del 1 al 10 de forma ágil)
-            for (let i = 10; i >= 1; i--) {
-                for (const ext of formatos) {
-                    const filePath = `episodios/episodio${i}.${ext}`;
-                    if (await checkFileExistsFast(filePath)) {
-                        availableEpisodes.push({ 
-                            name: `🎙️ Episodio ${i}`, 
-                            file: filePath 
-                        });
-                        break; 
-                    }
-                }
-            }
-
-            // 2. Buscar Canciones en /canciones/ (Del 1 al 10 de forma ágil)
-            for (let i = 10; i >= 1; i--) {
-                for (const ext of formatos) {
-                    const filePath = `canciones/cancion${i}.${ext}`;
-                    if (await checkFileExistsFast(filePath)) {
-                        availableEpisodes.push({ 
-                            name: `🎵 Canción ${i}`, 
-                            file: filePath 
-                        });
-                        break; 
-                    }
-                }
-            }
-
-            if (availableEpisodes.length > 0) {
-                episodeContainerBlock.style.display = "flex";
-                episodeSelect.innerHTML = "";
+            try {
+                const response = await fetch('lista.json?' + new Date().getTime());
+                if (!response.ok) throw new Error("No se pudo cargar la lista");
                 
-                availableEpisodes.forEach(ep => {
-                    const option = document.createElement('option');
-                    option.value = ep.file;
-                    option.textContent = ep.name;
-                    episodeSelect.appendChild(option);
-                });
+                const data = await response.json();
 
-                episodeStream.src = availableEpisodes[0].file;
-                episodeStream.preload = "none"; // Cero descarga previa
-            } else {
-                episodeContainerBlock.style.display = "none";
+                if (data.episodios) {
+                    data.episodios.forEach(ep => availableEpisodes.push(ep));
+                }
+                if (data.canciones) {
+                    data.canciones.forEach(c => availableEpisodes.push(c));
+                }
+
+                if (availableEpisodes.length > 0) {
+                    episodeContainerBlock.style.display = "flex";
+                    episodeSelect.innerHTML = "";
+                    
+                    availableEpisodes.forEach(ep => {
+                        const option = document.createElement('option');
+                        option.value = ep.file;
+                        option.textContent = ep.name;
+                        episodeSelect.appendChild(option);
+                    });
+
+                    episodeStream.src = availableEpisodes[0].file;
+                    episodeStream.preload = "none"; // Descarga cero bytes hasta dar Play
+                } else {
+                    episodeContainerBlock.style.display = "none";
+                }
+
+            } catch (error) {
+                console.log("Error cargando lista.json:", error);
+                episodeSelect.innerHTML = '<option value="">No hay audios disponibles</option>';
             }
-        }
-
-        // Verificación relámpago con timeout para evitar bloqueos
-        function checkFileExistsFast(url) {
-            return new Promise(resolve => {
-                const xhr = new XMLHttpRequest();
-                xhr.open('HEAD', url, true);
-                xhr.timeout = 1000;
-                xhr.onload = () => resolve(xhr.status === 200);
-                xhr.ontimeout = () => resolve(false);
-                xhr.onerror = () => resolve(false);
-                xhr.send();
-            });
         }
 
         episodeSelect.addEventListener('change', (e) => {
             episodeStream.src = e.target.value;
-            episodeStream.preload = "none"; // Mantiene descarga bajo demanda al cambiar
+            episodeStream.preload = "none"; 
             if (isPlayingEpisode) {
                 episodeStream.play();
             }
@@ -848,7 +823,20 @@
             return `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
         }
 
-        // Carga multiformato (.gif, .mp4, .webm) en la carpeta /gifs/
+        // Verificación rápida auxiliar
+        function checkFileExistsFast(url) {
+            return new Promise(resolve => {
+                const xhr = new XMLHttpRequest();
+                xhr.open('HEAD', url, true);
+                xhr.timeout = 1000;
+                xhr.onload = () => resolve(xhr.status === 200);
+                xhr.ontimeout = () => resolve(false);
+                xhr.onerror = () => resolve(false);
+                xhr.send();
+            });
+        }
+
+        // Carga multiformato de animaciones en /gifs/
         async function loadGifsAutomatically() {
             const container = document.getElementById('gifContainer');
             const totalGifs = 4;
