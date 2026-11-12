@@ -491,7 +491,7 @@
         }
     </style>
 
-<!-- Enlace para activar PWA (Instalación de acceso directo) -->
+    <!-- Enlace para activar PWA (Instalación de acceso directo) -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ff0055">
     <script>
@@ -503,14 +503,13 @@
             });
         }
     </script>
-
 </head>
 <body>
 
     <!-- Archivo de configuración externo -->
     <script src="config.js"></script>
 
-    <!-- Audios (Rutas apuntando a carpetas /audio/ y /episodios/) -->
+    <!-- Audios (Rutas apuntando a carpetas /audio/, /episodios/ y /canciones/) -->
     <audio id="backgroundAudio" loop src="audio/musica_fondo.mp3"></audio>
     <audio id="radioStream" preload="none"></audio>
     <audio id="episodeStream" preload="none"></audio>
@@ -552,24 +551,24 @@
                 </div>
             </div>
 
-           <!-- 3. Panel de Episodios con indicador de carga -->
-<div class="episode-block" id="episodeContainerBlock">
-    <div class="episode-controls-row">
-        <select id="episodeSelect" class="episode-select" title="Seleccionar contenido">
-            <option value="" disabled selected>Cargando contenidos...</option>
-        </select>
-        <button id="episodePlayBtn" class="episode-play-btn" title="Reproducir / Pausar">
-            <i class="fa-solid fa-play" id="episodeIcon"></i>
-        </button>
-    </div>
-    <div class="progress-container">
-        <input type="range" id="progressBar" class="progress-bar" value="0" min="0" max="100" step="0.1">
-        <div class="time-info">
-            <span id="currentTime">00:00</span>
-            <span id="durationTime">00:00</span>
-        </div>
-    </div>
-</div>
+            <!-- 3. Panel de Episodios y Canciones -->
+            <div class="episode-block" id="episodeContainerBlock">
+                <div class="episode-controls-row">
+                    <select id="episodeSelect" class="episode-select" title="Seleccionar contenido">
+                        <option value="" disabled selected>🎧 Cargando contenidos...</option>
+                    </select>
+                    <button id="episodePlayBtn" class="episode-play-btn" title="Reproducir / Pausar">
+                        <i class="fa-solid fa-play" id="episodeIcon"></i>
+                    </button>
+                </div>
+                <div class="progress-container">
+                    <input type="range" id="progressBar" class="progress-bar" value="0" min="0" max="100" step="0.1">
+                    <div class="time-info">
+                        <span id="currentTime">00:00</span>
+                        <span id="durationTime">00:00</span>
+                    </div>
+                </div>
+            </div>
 
             <!-- 4. Emisora -->
             <div class="station-block">
@@ -731,16 +730,18 @@
             }
         });
 
-        // Búsqueda multiformato en la carpeta /episodios/ (.aac, .mp3, .m4a, .wav)
+        // Detección ultrarrápida y progresiva de Episodios y Canciones
         async function detectAvailableEpisodes() {
             availableEpisodes = [];
             const formatos = ['mp3', 'aac', 'm4a', 'wav'];
             
-            // 1. Buscar Episodios (del 20 al 1)
-            for (let i = 20; i >= 1; i--) {
+            episodeSelect.innerHTML = '<option value="" disabled selected>🎧 Cargando contenidos...</option>';
+
+            // 1. Buscar Episodios en /episodios/ (Del 1 al 10 de forma ágil)
+            for (let i = 10; i >= 1; i--) {
                 for (const ext of formatos) {
                     const filePath = `episodios/episodio${i}.${ext}`;
-                    if (await checkFileExists(filePath)) {
+                    if (await checkFileExistsFast(filePath)) {
                         availableEpisodes.push({ 
                             name: `🎙️ Episodio ${i}`, 
                             file: filePath 
@@ -750,11 +751,11 @@
                 }
             }
 
-            // 2. Buscar Canciones (del 20 al 1 en carpeta /canciones/)
-            for (let i = 20; i >= 1; i--) {
+            // 2. Buscar Canciones en /canciones/ (Del 1 al 10 de forma ágil)
+            for (let i = 10; i >= 1; i--) {
                 for (const ext of formatos) {
                     const filePath = `canciones/cancion${i}.${ext}`;
-                    if (await checkFileExists(filePath)) {
+                    if (await checkFileExistsFast(filePath)) {
                         availableEpisodes.push({ 
                             name: `🎵 Canción ${i}`, 
                             file: filePath 
@@ -764,26 +765,32 @@
                 }
             }
 
-            // Rellenar el selector visual
             if (availableEpisodes.length > 0) {
+                episodeContainerBlock.style.display = "flex";
                 episodeSelect.innerHTML = "";
+                
                 availableEpisodes.forEach(ep => {
                     const option = document.createElement('option');
                     option.value = ep.file;
                     option.textContent = ep.name;
                     episodeSelect.appendChild(option);
                 });
+
                 episodeStream.src = availableEpisodes[0].file;
+                episodeStream.preload = "none"; // Cero descarga previa
             } else {
-                episodeSelect.innerHTML = '<option value="">No hay audios disponibles</option>';
+                episodeContainerBlock.style.display = "none";
             }
         }
 
-        function checkFileExists(url) {
+        // Verificación relámpago con timeout para evitar bloqueos
+        function checkFileExistsFast(url) {
             return new Promise(resolve => {
                 const xhr = new XMLHttpRequest();
                 xhr.open('HEAD', url, true);
+                xhr.timeout = 1000;
                 xhr.onload = () => resolve(xhr.status === 200);
+                xhr.ontimeout = () => resolve(false);
                 xhr.onerror = () => resolve(false);
                 xhr.send();
             });
@@ -791,6 +798,7 @@
 
         episodeSelect.addEventListener('change', (e) => {
             episodeStream.src = e.target.value;
+            episodeStream.preload = "none"; // Mantiene descarga bajo demanda al cambiar
             if (isPlayingEpisode) {
                 episodeStream.play();
             }
@@ -851,13 +859,12 @@
                 let found = false;
                 for (const ext of extensiones) {
                     const path = `gifs/gif${i}.${ext}`;
-                    if (await checkFileExists(path)) {
+                    if (await checkFileExistsFast(path)) {
                         loadedMedia.push({ path, type: ext });
                         found = true;
                         break;
                     }
                 }
-                // Si no existe la carpeta /gifs/, intenta fallback en la raíz
                 if (!found) {
                     loadedMedia.push({ path: `gif${i}.gif`, type: 'gif' });
                 }
