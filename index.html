@@ -552,23 +552,24 @@
                 </div>
             </div>
 
-            <!-- 3. Panel de Episodios -->
-            <div class="episode-block" id="episodeContainerBlock" style="display: none;">
-                <div class="episode-controls-row">
-                    <select id="episodeSelect" class="episode-select" title="Seleccionar episodio">
-                    </select>
-                    <button id="episodePlayBtn" class="episode-play-btn" title="Reproducir / Pausar Episodio">
-                        <i class="fa-solid fa-play" id="episodeIcon"></i>
-                    </button>
-                </div>
-                <div class="progress-container">
-                    <input type="range" id="progressBar" class="progress-bar" value="0" min="0" max="100" step="0.1">
-                    <div class="time-info">
-                        <span id="currentTime">00:00</span>
-                        <span id="durationTime">00:00</span>
-                    </div>
-                </div>
-            </div>
+           <!-- 3. Panel de Episodios con indicador de carga -->
+<div class="episode-block" id="episodeContainerBlock">
+    <div class="episode-controls-row">
+        <select id="episodeSelect" class="episode-select" title="Seleccionar contenido">
+            <option value="" disabled selected>Cargando contenidos...</option>
+        </select>
+        <button id="episodePlayBtn" class="episode-play-btn" title="Reproducir / Pausar">
+            <i class="fa-solid fa-play" id="episodeIcon"></i>
+        </button>
+    </div>
+    <div class="progress-container">
+        <input type="range" id="progressBar" class="progress-bar" value="0" min="0" max="100" step="0.1">
+        <div class="time-info">
+            <span id="currentTime">00:00</span>
+            <span id="durationTime">00:00</span>
+        </div>
+    </div>
+</div>
 
             <!-- 4. Emisora -->
             <div class="station-block">
