@@ -734,14 +734,15 @@
         // Búsqueda multiformato en la carpeta /episodios/ (.aac, .mp3, .m4a, .wav)
         async function detectAvailableEpisodes() {
             availableEpisodes = [];
-            const formatos = ['aac', 'mp3', 'm4a', 'wav'];
+            const formatos = ['mp3', 'aac', 'm4a', 'wav'];
             
-            for (let i = 50; i >= 1; i--) {
+            // 1. Buscar Episodios (del 20 al 1)
+            for (let i = 20; i >= 1; i--) {
                 for (const ext of formatos) {
                     const filePath = `episodios/episodio${i}.${ext}`;
                     if (await checkFileExists(filePath)) {
                         availableEpisodes.push({ 
-                            name: `Episodio ${i} (${ext.toUpperCase()})`, 
+                            name: `🎙️ Episodio ${i}`, 
                             file: filePath 
                         });
                         break; 
@@ -749,8 +750,22 @@
                 }
             }
 
+            // 2. Buscar Canciones (del 20 al 1 en carpeta /canciones/)
+            for (let i = 20; i >= 1; i--) {
+                for (const ext of formatos) {
+                    const filePath = `canciones/cancion${i}.${ext}`;
+                    if (await checkFileExists(filePath)) {
+                        availableEpisodes.push({ 
+                            name: `🎵 Canción ${i}`, 
+                            file: filePath 
+                        });
+                        break; 
+                    }
+                }
+            }
+
+            // Rellenar el selector visual
             if (availableEpisodes.length > 0) {
-                episodeContainerBlock.style.display = "flex";
                 episodeSelect.innerHTML = "";
                 availableEpisodes.forEach(ep => {
                     const option = document.createElement('option');
@@ -759,6 +774,8 @@
                     episodeSelect.appendChild(option);
                 });
                 episodeStream.src = availableEpisodes[0].file;
+            } else {
+                episodeSelect.innerHTML = '<option value="">No hay audios disponibles</option>';
             }
         }
 
