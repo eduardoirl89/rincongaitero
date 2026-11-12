@@ -308,7 +308,7 @@
             color: #ff0055;
         }
 
-        /* 3. Panel de Episodios con Selector y Barra de Tiempo */
+        /* 3. Panel de Episodios con Selector Antideformación */
         .episode-block {
             position: absolute;
             top: 50%;
@@ -320,45 +320,59 @@
             backdrop-filter: blur(10px);
             border: 2px solid rgba(255, 0, 85, 0.4);
             border-radius: 20px;
-            padding: 10px 15px;
+            padding: 12px 15px;
             z-index: 10;
             box-shadow: 0 0 20px rgba(255, 0, 85, 0.2);
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
         }
 
         .episode-controls-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 10px;
+            gap: 8px;
+            width: 100%;
         }
 
         .episode-select {
             background: rgba(13, 6, 20, 0.9);
             color: #fff;
             border: 1px solid rgba(255, 0, 85, 0.6);
-            padding: 5px 10px;
+            padding: 6px 12px;
             border-radius: 12px;
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             font-weight: 700;
             outline: none;
             flex: 1;
+            min-width: 0; /* Vital para que flexbox permita truncar el texto */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
             cursor: pointer;
+        }
+
+        /* Opciones del selector estilizadas para truncar nombres largos en móviles */
+        .episode-select option {
+            background: #12071f;
+            color: #fff;
+            padding: 5px;
         }
 
         .episode-play-btn {
             background: #ff0055;
             color: #fff;
             border: none;
-            width: 32px;
-            height: 32px;
+            min-width: 36px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
+            flex-shrink: 0; /* Evita que el botón se aplaste o deforme */
             box-shadow: 0 2px 8px rgba(255,0,85,0.6);
             transition: transform 0.2s;
         }
@@ -528,9 +542,7 @@
             <!-- 1. Cabecera -->
             <div class="header-container-relative">
                 <div class="header-box-wrapper">
-                    <!-- Ruta al logo del cuatro en /logos/ -->
                     <img src="logos/cuatro.png" alt="Cuatro" class="cuatro-inline" onerror="this.src='cuatro.png';">
-                    
                     <div class="unified-ellipse">
                         <div class="ellipse-text" id="uiProgramName">RINCON GAITERO</div>
                     </div>
@@ -551,8 +563,8 @@
                 </div>
             </div>
 
-            <!-- 3. Panel de Episodios y Canciones (Carga automática con lista.json) -->
-            <div class="episode-block" id="episodeContainerBlock">
+            <!-- 3. Panel de Episodios y Canciones -->
+            <div class="episode-block" id="episodeContainerBlock" style="display: none;">
                 <div class="episode-controls-row">
                     <select id="episodeSelect" class="episode-select" title="Seleccionar contenido">
                         <option value="" disabled selected>🎧 Cargando contenidos...</option>
@@ -730,7 +742,7 @@
             }
         });
 
-        // Lectura automática y dinámica desde lista.json con nombres personalizados
+        // Lectura automática de lista.json
         async function detectAvailableEpisodes() {
             availableEpisodes = [];
             episodeSelect.innerHTML = '<option value="" disabled selected>🎧 Cargando contenidos...</option>';
@@ -741,12 +753,8 @@
                 
                 const data = await response.json();
 
-                if (data.episodios) {
-                    data.episodios.forEach(ep => availableEpisodes.push(ep));
-                }
-                if (data.canciones) {
-                    data.canciones.forEach(c => availableEpisodes.push(c));
-                }
+                if (data.episodios) data.episodios.forEach(ep => availableEpisodes.push(ep));
+                if (data.canciones) data.canciones.forEach(c => availableEpisodes.push(c));
 
                 if (availableEpisodes.length > 0) {
                     episodeContainerBlock.style.display = "flex";
@@ -760,7 +768,7 @@
                     });
 
                     episodeStream.src = availableEpisodes[0].file;
-                    episodeStream.preload = "none"; // Descarga cero bytes hasta dar Play
+                    episodeStream.preload = "none"; 
                 } else {
                     episodeContainerBlock.style.display = "none";
                 }
@@ -774,8 +782,13 @@
         episodeSelect.addEventListener('change', (e) => {
             episodeStream.src = e.target.value;
             episodeStream.preload = "none"; 
+            
+            // Si estaba sonando y cambia de opción, reproduce el nuevo y asegura el icono activo
             if (isPlayingEpisode) {
-                episodeStream.play();
+                episodeStream.play().catch(err => console.log(err));
+                episodeIcon.className = "fa-solid fa-stop";
+            } else {
+                episodeIcon.className = "fa-solid fa-play";
             }
         });
 
@@ -792,13 +805,19 @@
 
                 episodeStream.play().then(() => {
                     isPlayingEpisode = true;
-                    episodeIcon.className = "fa-solid fa-stop";
+                    episodeIcon.className = "fa-solid fa-stop"; // Cambia dinámicamente a Stop/Pause
                 }).catch(err => console.log(err));
             } else {
                 episodeStream.pause();
                 isPlayingEpisode = false;
-                episodeIcon.className = "fa-solid fa-play";
+                episodeIcon.className = "fa-solid fa-play"; // Vuelve a Play
             }
+        });
+
+        // Asegurar que si el audio termina solo, el botón regrese al icono de Play
+        episodeStream.addEventListener('ended', () => {
+            isPlayingEpisode = false;
+            episodeIcon.className = "fa-solid fa-play";
         });
 
         episodeStream.addEventListener('timeupdate', () => {
@@ -823,7 +842,6 @@
             return `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
         }
 
-        // Verificación rápida auxiliar
         function checkFileExistsFast(url) {
             return new Promise(resolve => {
                 const xhr = new XMLHttpRequest();
@@ -836,7 +854,6 @@
             });
         }
 
-        // Carga multiformato de animaciones en /gifs/
         async function loadGifsAutomatically() {
             const container = document.getElementById('gifContainer');
             const totalGifs = 4;
