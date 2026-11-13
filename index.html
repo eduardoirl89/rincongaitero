@@ -267,7 +267,6 @@
             position: relative;
         }
 
-        /* Sin transiciones: cambio instantáneo (corte seco) */
         .media-slide {
             position: absolute;
             top: 0;
@@ -275,11 +274,17 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            display: none;
+            opacity: 1;
         }
 
-        .media-slide.active {
-            display: block;
+        /* La transición y opacidad variable solo aplican si hay rotación multislide */
+        .has-rotation .media-slide {
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        .has-rotation .media-slide.active {
+            opacity: 1;
         }
 
         .play-indicator {
@@ -874,6 +879,13 @@
 
             container.innerHTML = '';
             
+            // Gestionar clase condicional de rotación según la cantidad de elementos
+            if (loadedMedia.length > 1) {
+                container.classList.add('has-rotation');
+            } else {
+                container.classList.remove('has-rotation');
+            }
+
             loadedMedia.forEach((media, i) => {
                 let element;
                 if (media.type === 'gif') {
@@ -887,12 +899,10 @@
                     element.muted = true;
                     element.playsInline = true;
                 }
-                // Si solo hay 1 archivo, se queda visible estático. Si hay varios, solo el primero arranca activo.
                 element.className = `media-slide ${i === 0 ? 'active' : ''}`;
                 container.appendChild(element);
             });
 
-            // Solo activa el rotador si hay más de 1 elemento encontrado
             if (loadedMedia.length > 1) {
                 initDynamicGifRotator();
             }
@@ -902,7 +912,7 @@
             const slides = document.querySelectorAll('.media-slide');
             let currentSlide = 0;
             setInterval(() => {
-                if (slides.length > 1) {
+                if (slides.length > 0) {
                     slides[currentSlide].classList.remove('active');
                     currentSlide = (currentSlide + 1) % slides.length;
                     slides[currentSlide].classList.add('active');
