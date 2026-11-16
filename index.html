@@ -536,10 +536,10 @@
     <!-- Archivo de configuración externo -->
     <script src="config.js"></script>
 
-    <!-- Audios (Rutas apuntando a carpetas /audio/, /episodios/ y /canciones/) -->
+    <!-- Audios -->
     <audio id="backgroundAudio" loop src="audio/musica_fondo.mp3"></audio>
     <audio id="radioStream" preload="none"></audio>
-    <audio id="episodeStream" preload="none"></audio>
+    <audio id="episodeStream" preload="metadata"></audio>
 
     <div class="wrapper">
         <div class="bg-glow-effect"></div>
@@ -819,7 +819,8 @@
                     });
 
                     episodeStream.src = availableEpisodes[0].file;
-                    episodeStream.preload = "none"; 
+                    episodeStream.preload = "metadata";
+                    episodeStream.load();
                 } else {
                     episodeContainerBlock.style.display = "none";
                 }
@@ -892,19 +893,44 @@
             }, 3000);
         }
 
+        // Cambio de canción en el selector con reinicio limpio y reproducción inmediata
         episodeSelect.addEventListener('change', (e) => {
-            episodeStream.src = e.target.value;
-            episodeStream.preload = "none"; 
-            
-            if (isPlayingEpisode) {
-                episodeStream.play().catch(err => console.log(err));
-                episodeIcon.className = "fa-solid fa-stop";
-            } else {
-                episodeIcon.className = "fa-solid fa-play";
+            const nuevaRuta = e.target.value;
+            if (!nuevaRuta) return;
+
+            episodeStream.pause();
+            progressBar.value = 0;
+            currentTimeEl.textContent = "00:00";
+            durationTimeEl.textContent = "00:00";
+
+            episodeStream.src = nuevaRuta;
+            episodeStream.preload = "auto";
+            episodeStream.load();
+
+            if (isPlayingLive) {
+                audioStream.pause();
+                isPlayingLive = false;
+                playIcon.className = "fa-solid fa-play";
+                statusLabel.innerText = isLiveAllowed ? "TOCA PARA ESCUCHAR" : "FUERA DE AIRE";
             }
+
+            if (!bgAudio.paused) fadeOutBackground();
+
+            episodeIcon.className = "fa-solid fa-spinner fa-spin";
+            episodeStream.play().then(() => {
+                isPlayingEpisode = true;
+                episodeIcon.className = "fa-solid fa-stop";
+            }).catch(err => {
+                console.error("Error al cambiar de pista:", err);
+                isPlayingEpisode = false;
+                episodeIcon.className = "fa-solid fa-play";
+            });
         });
 
+        // Botón Play / Stop
         episodePlayBtn.addEventListener('click', () => {
+            if (!episodeStream.src) return;
+
             if (!isPlayingEpisode) {
                 if (isPlayingLive) {
                     audioStream.pause();
@@ -915,10 +941,15 @@
 
                 if (!bgAudio.paused) fadeOutBackground();
 
+                episodeIcon.className = "fa-solid fa-spinner fa-spin";
                 episodeStream.play().then(() => {
                     isPlayingEpisode = true;
                     episodeIcon.className = "fa-solid fa-stop";
-                }).catch(err => console.log(err));
+                }).catch(err => {
+                    console.error("Error al reproducir:", err);
+                    isPlayingEpisode = false;
+                    episodeIcon.className = "fa-solid fa-play";
+                });
             } else {
                 episodeStream.pause();
                 isPlayingEpisode = false;
@@ -931,8 +962,14 @@
             episodeIcon.className = "fa-solid fa-play";
         });
 
-        episodeStream.addEventListener('timeupdate', () => {
+        episodeStream.addEventListener('loadedmetadata', () => {
             if (!isNaN(episodeStream.duration)) {
+                durationTimeEl.textContent = formatTime(episodeStream.duration);
+            }
+        });
+
+        episodeStream.addEventListener('timeupdate', () => {
+            if (!isNaN(episodeStream.duration) && episodeStream.duration > 0) {
                 const progress = (episodeStream.currentTime / episodeStream.duration) * 100;
                 progressBar.value = progress;
                 currentTimeEl.textContent = formatTime(episodeStream.currentTime);
@@ -941,7 +978,7 @@
         });
 
         progressBar.addEventListener('input', () => {
-            if (!isNaN(episodeStream.duration)) {
+            if (!isNaN(episodeStream.duration) && episodeStream.duration > 0) {
                 const seekTime = (progressBar.value / 100) * episodeStream.duration;
                 episodeStream.currentTime = seekTime;
             }
