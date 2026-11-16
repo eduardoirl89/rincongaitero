@@ -1,7 +1,7 @@
 {
   "name": "Rincón Gaitero",
   "short_name": "Rincón Gaitero",
-  "start_url": "/",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#0d0614",
   "theme_color": "#ff0055",
