@@ -267,6 +267,7 @@
             position: relative;
         }
 
+        /* Sin transiciones: cambio instantáneo */
         .media-slide {
             position: absolute;
             top: 0;
@@ -274,17 +275,12 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            opacity: 1;
+            display: none;
+            transition: none;
         }
 
-        /* La transición y opacidad variable solo aplican si hay rotación multislide */
-        .has-rotation .media-slide {
-            opacity: 0;
-            transition: opacity 1.5s ease-in-out;
-        }
-
-        .has-rotation .media-slide.active {
-            opacity: 1;
+        .media-slide.active {
+            display: block;
         }
 
         .play-indicator {
@@ -654,14 +650,18 @@
             const currentDay = now.getDay();
             const currentHour = now.getHours();
 
-            const esDiaDePrograma = CONFIG.diasPrograma.includes(currentDay);
+            const esDiaDePrograma = Array.isArray(CONFIG.diasPrograma) && CONFIG.diasPrograma.includes(currentDay);
 
             if (esDiaDePrograma && currentHour >= CONFIG.horaInicio && currentHour < CONFIG.horaFin) {
                 isLiveAllowed = true;
-                statusLabel.innerText = "TOCA PARA ESCUCHAR";
+                if (!isPlayingLive) {
+                    statusLabel.innerText = "TOCA PARA ESCUCHAR";
+                }
             } else {
                 isLiveAllowed = false;
-                statusLabel.innerText = "FUERA DE AIRE";
+                if (!isPlayingLive) {
+                    statusLabel.innerText = "FUERA DE AIRE";
+                }
             }
         }
 
@@ -673,26 +673,47 @@
                 return;
             }
 
-            const dias = CONFIG.diasPrograma; 
+            const dias = Array.isArray(CONFIG.diasPrograma) && CONFIG.diasPrograma.length > 0 ? CONFIG.diasPrograma : [0];
             const timeString = `de ${CONFIG.textoHoraInicio} a ${CONFIG.textoHoraFin}`;
 
             const now = new Date();
-            const currentDay = now.getDay(); 
+            const currentDay = now.getDay();
+            const currentHour = now.getHours();
+            const horaFin = typeof CONFIG.horaFin === 'number' ? CONFIG.horaFin : 18;
 
             const nombresDiasSingular = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
             
-            if (dias.includes(currentDay)) {
+            if (dias.includes(currentDay) && currentHour < horaFin) {
                 scheduleElement.innerText = `hoy ${timeString}`;
-            } else {
-                let proxDia = dias[0];
-                scheduleElement.innerText = `próximo ${nombresDiasSingular[proxDia]} ${timeString}`;
+                return;
             }
+
+            let proxDia = dias[0];
+            let menorDistancia = 8;
+
+            for (const d of dias) {
+                let diff = (d - currentDay + 7) % 7;
+                if (diff === 0) {
+                    diff = 7;
+                }
+                if (diff < menorDistancia) {
+                    menorDistancia = diff;
+                    proxDia = d;
+                }
+            }
+
+            scheduleElement.innerText = `próximo ${nombresDiasSingular[proxDia]} ${timeString}`;
         }
 
         window.addEventListener('load', () => {
             updateDynamicSchedule();
             checkLiveAvailability();
             detectAvailableEpisodes();
+
+            setInterval(() => {
+                updateDynamicSchedule();
+                checkLiveAvailability();
+            }, 60000);
 
             bgAudio.volume = 0.5;
             bgAudio.play().catch(() => {
@@ -848,8 +869,8 @@
             return new Promise(resolve => {
                 const xhr = new XMLHttpRequest();
                 xhr.open('HEAD', url, true);
-                xhr.timeout = 1000;
-                xhr.onload = () => resolve(xhr.status === 200);
+                xhr.timeout = 1500;
+                xhr.onload = () => resolve(xhr.status >= 200 && xhr.status < 300);
                 xhr.ontimeout = () => resolve(false);
                 xhr.onerror = () => resolve(false);
                 xhr.send();
@@ -859,31 +880,24 @@
         async function loadGifsAutomatically() {
             const container = document.getElementById('gifContainer');
             const totalGifs = 4;
-            const extensiones = ['gif', 'mp4', 'webm'];
+            const carpeta = 'gifs';
+            const extensiones = ['mp4', 'gif'];
             let loadedMedia = [];
 
             for (let i = 1; i <= totalGifs; i++) {
-                let found = false;
                 for (const ext of extensiones) {
-                    const path = `gifs/gif${i}.${ext}`;
+                    const path = `${carpeta}/gif${i}.${ext}`;
                     if (await checkFileExistsFast(path)) {
                         loadedMedia.push({ path, type: ext });
-                        found = true;
                         break;
                     }
-                }
-                if (!found) {
-                    loadedMedia.push({ path: `gif${i}.gif`, type: 'gif' });
                 }
             }
 
             container.innerHTML = '';
-            
-            // Gestionar clase condicional de rotación según la cantidad de elementos
-            if (loadedMedia.length > 1) {
-                container.classList.add('has-rotation');
-            } else {
-                container.classList.remove('has-rotation');
+
+            if (loadedMedia.length === 0) {
+                return;
             }
 
             loadedMedia.forEach((media, i) => {
@@ -894,10 +908,17 @@
                 } else {
                     element = document.createElement('video');
                     element.src = media.path;
+                    element.muted = true;
+                    element.defaultMuted = true;
                     element.autoplay = true;
                     element.loop = true;
-                    element.muted = true;
                     element.playsInline = true;
+                    element.setAttribute('muted', '');
+                    element.setAttribute('autoplay', '');
+                    element.setAttribute('loop', '');
+                    element.setAttribute('playsinline', '');
+                    element.load();
+                    element.play().catch(() => {});
                 }
                 element.className = `media-slide ${i === 0 ? 'active' : ''}`;
                 container.appendChild(element);
@@ -910,12 +931,16 @@
 
         function initDynamicGifRotator() {
             const slides = document.querySelectorAll('.media-slide');
+            if (slides.length <= 1) return;
+
             let currentSlide = 0;
             setInterval(() => {
-                if (slides.length > 0) {
-                    slides[currentSlide].classList.remove('active');
-                    currentSlide = (currentSlide + 1) % slides.length;
-                    slides[currentSlide].classList.add('active');
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % slides.length;
+                const nextSlide = slides[currentSlide];
+                nextSlide.classList.add('active');
+                if (nextSlide.tagName === 'VIDEO') {
+                    nextSlide.play().catch(() => {});
                 }
             }, 2500);
         }
