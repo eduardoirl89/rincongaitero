@@ -267,7 +267,7 @@
             position: relative;
         }
 
-        /* Estado base: visible y sin transición/desenfoque cuando hay 1 solo elemento */
+        /* Elemento único: fijo, sin desenfoque ni transición */
         .media-slide {
             position: absolute;
             top: 0;
@@ -280,7 +280,7 @@
             transform: scale(1);
         }
 
-        /* Transición de desvanecido + desenfoque activa SOLO cuando hay más de 1 elemento */
+        /* Transición de desvanecido + desenfoque activa solo cuando hay más de 1 archivo */
         .has-rotation .media-slide {
             opacity: 0;
             filter: blur(10px);
@@ -721,7 +721,7 @@
         window.addEventListener('load', () => {
             updateDynamicSchedule();
             checkLiveAvailability();
-            detectAvailableEpisodes();
+            cargarContenidoDesdeListaJson();
 
             setInterval(() => {
                 updateDynamicSchedule();
@@ -780,19 +780,32 @@
             }
         });
 
-        // Lectura automática de lista.json
-        async function detectAvailableEpisodes() {
+        function getMediaTypeFromFilename(filename) {
+            const cleanName = filename.split('?')[0].toLowerCase();
+            if (cleanName.endsWith('.mp4') || cleanName.endsWith('.webm')) return 'video';
+            return 'image';
+        }
+
+        function resolveGifPath(item) {
+            const raw = typeof item === 'string' ? item : (item && item.file ? item.file : '');
+            if (!raw) return '';
+            return raw.includes('/') ? raw : `gifs/${raw}`;
+        }
+
+        // Lectura unificada de lista.json (episodios, canciones y gifs)
+        async function cargarContenidoDesdeListaJson() {
             availableEpisodes = [];
             episodeSelect.innerHTML = '<option value="" disabled selected>🎧 Cargando contenidos...</option>';
 
             try {
-                const response = await fetch('lista.json?' + new Date().getTime());
-                if (!response.ok) throw new Error("No se pudo cargar la lista");
+                const response = await fetch('lista.json?' + new Date().getTime(), { cache: 'no-store' });
+                if (!response.ok) throw new Error("No se pudo cargar lista.json");
                 
                 const data = await response.json();
 
-                if (data.episodios) data.episodios.forEach(ep => availableEpisodes.push(ep));
-                if (data.canciones) data.canciones.forEach(c => availableEpisodes.push(c));
+                // 1. Cargar audios (episodios y canciones)
+                if (Array.isArray(data.episodios)) data.episodios.forEach(ep => availableEpisodes.push(ep));
+                if (Array.isArray(data.canciones)) data.canciones.forEach(c => availableEpisodes.push(c));
 
                 if (availableEpisodes.length > 0) {
                     episodeContainerBlock.style.display = "flex";
@@ -811,10 +824,72 @@
                     episodeContainerBlock.style.display = "none";
                 }
 
+                // 2. Cargar círculo de GIFs / videos / imágenes
+                const gifItems = Array.isArray(data.gifs) ? data.gifs : [];
+                renderizarCirculoMedia(gifItems);
+
             } catch (error) {
-                console.log("Error cargando lista.json:", error);
+                console.error("Error leyendo lista.json:", error);
                 episodeSelect.innerHTML = '<option value="">No hay audios disponibles</option>';
             }
+        }
+
+        function renderizarCirculoMedia(gifItems) {
+            const container = document.getElementById('gifContainer');
+            container.innerHTML = '';
+            container.classList.remove('has-rotation');
+
+            const paths = gifItems.map(resolveGifPath).filter(Boolean);
+            if (paths.length === 0) return;
+
+            paths.forEach((path, i) => {
+                const mediaType = getMediaTypeFromFilename(path);
+                let element;
+
+                if (mediaType === 'video') {
+                    element = document.createElement('video');
+                    element.src = path;
+                    element.muted = true;
+                    element.defaultMuted = true;
+                    element.autoplay = true;
+                    element.loop = true;
+                    element.playsInline = true;
+                    element.setAttribute('muted', '');
+                    element.setAttribute('autoplay', '');
+                    element.setAttribute('loop', '');
+                    element.setAttribute('playsinline', '');
+                    element.load();
+                    element.play().catch(() => {});
+                } else {
+                    element = document.createElement('img');
+                    element.src = path;
+                    element.alt = 'Animación Rincón Gaitero';
+                }
+
+                element.className = `media-slide ${i === 0 ? 'active' : ''}`;
+                container.appendChild(element);
+            });
+
+            const slides = container.querySelectorAll('.media-slide');
+            if (slides.length > 1) {
+                container.classList.add('has-rotation');
+                initDynamicGifRotator(slides);
+            }
+        }
+
+        function initDynamicGifRotator(slides) {
+            if (!slides || slides.length <= 1) return;
+
+            let currentSlide = 0;
+            setInterval(() => {
+                slides[currentSlide].classList.remove('active');
+                currentSlide = (currentSlide + 1) % slides.length;
+                const nextSlide = slides[currentSlide];
+                nextSlide.classList.add('active');
+                if (nextSlide.tagName === 'VIDEO') {
+                    nextSlide.play().catch(() => {});
+                }
+            }, 3000);
         }
 
         episodeSelect.addEventListener('change', (e) => {
@@ -877,94 +952,6 @@
             const secs = Math.floor(seconds % 60);
             return `${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
         }
-
-        function getMediaTypeFromFilename(filename) {
-            const cleanName = filename.split('?')[0].toLowerCase();
-            if (cleanName.endsWith('.mp4')) return 'video';
-            return 'image';
-        }
-
-        async function loadGifsAutomatically() {
-            const container = document.getElementById('gifContainer');
-            const carpeta = 'gifs';
-            let filenames = [];
-
-            try {
-                const res = await fetch(`${carpeta}/media.json?` + new Date().getTime());
-                if (res.ok) {
-                    const jsonData = await res.json();
-                    if (Array.isArray(jsonData.archivos)) {
-                        filenames = jsonData.archivos;
-                    } else if (Array.isArray(jsonData)) {
-                        filenames = jsonData;
-                    }
-                }
-            } catch (e) {
-                console.log("No se encontró gifs/media.json:", e);
-            }
-
-            container.innerHTML = '';
-            container.classList.remove('has-rotation');
-
-            if (!filenames || filenames.length === 0) {
-                return;
-            }
-
-            filenames.forEach((item, i) => {
-                const rawPath = typeof item === 'string' ? item : item.file;
-                if (!rawPath) return;
-
-                const path = rawPath.includes('/') ? rawPath : `${carpeta}/${rawPath}`;
-                const mediaType = getMediaTypeFromFilename(path);
-
-                let element;
-                if (mediaType === 'video') {
-                    element = document.createElement('video');
-                    element.src = path;
-                    element.muted = true;
-                    element.defaultMuted = true;
-                    element.autoplay = true;
-                    element.loop = true;
-                    element.playsInline = true;
-                    element.setAttribute('muted', '');
-                    element.setAttribute('autoplay', '');
-                    element.setAttribute('loop', '');
-                    element.setAttribute('playsinline', '');
-                    element.load();
-                    element.play().catch(() => {});
-                } else {
-                    element = document.createElement('img');
-                    element.src = path;
-                    element.alt = 'Animación Rincón Gaitero';
-                }
-
-                element.className = `media-slide ${i === 0 ? 'active' : ''}`;
-                container.appendChild(element);
-            });
-
-            const slides = container.querySelectorAll('.media-slide');
-            if (slides.length > 1) {
-                container.classList.add('has-rotation');
-                initDynamicGifRotator(slides);
-            }
-        }
-
-        function initDynamicGifRotator(slides) {
-            if (!slides || slides.length <= 1) return;
-
-            let currentSlide = 0;
-            setInterval(() => {
-                slides[currentSlide].classList.remove('active');
-                currentSlide = (currentSlide + 1) % slides.length;
-                const nextSlide = slides[currentSlide];
-                nextSlide.classList.add('active');
-                if (nextSlide.tagName === 'VIDEO') {
-                    nextSlide.play().catch(() => {});
-                }
-            }, 3000);
-        }
-
-        loadGifsAutomatically();
     </script>
 </body>
 </html>
