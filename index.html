@@ -537,7 +537,7 @@
     <script src="config.js"></script>
 
     <!-- Audios -->
-    <audio id="backgroundAudio" loop src="audio/musica_fondo.mp3"></audio>
+    <audio id="backgroundAudio" preload="auto"></audio>
     <audio id="radioStream" preload="none"></audio>
     <audio id="episodeStream" preload="metadata"></audio>
 
@@ -657,6 +657,12 @@
         let isLiveAllowed = false;
         let availableEpisodes = [];
 
+        // Control de música de fondo (lista dinámica + límite de 1 minuto)
+        let bgPlaylist = [];
+        let bgTrackIndex = 0;
+        let bgStopTimeout = null;
+        let bgManualStopped = false;
+
         function checkLiveAvailability() {
             if (typeof CONFIG === 'undefined') return;
             const now = new Date();
@@ -718,6 +724,69 @@
             scheduleElement.innerText = `próximo ${nombresDiasSingular[proxDia]} ${timeString}`;
         }
 
+        function iniciarMusicaDeFondo() {
+            if (bgManualStopped || isPlayingLive || isPlayingEpisode || bgPlaylist.length === 0) return;
+
+            bgAudio.src = bgPlaylist[bgTrackIndex];
+            bgAudio.volume = 0.5;
+            bgAudio.load();
+
+            bgAudio.play().then(() => {
+                // Detener automáticamente al cumplirse 1 minuto (60,000 ms)
+                if (!bgStopTimeout) {
+                    bgStopTimeout = setTimeout(() => {
+                        detenerMusicaDeFondo(true);
+                    }, 60000);
+                }
+            }).catch(() => {
+                // Si el navegador bloquea el autoplay inicial, arranca con la primera interacción del usuario
+                const unlockAudio = (e) => {
+                    window.removeEventListener('click', unlockAudio);
+                    window.removeEventListener('touchstart', unlockAudio);
+                    if (!bgManualStopped && !isPlayingLive && !isPlayingEpisode && bgAudio.paused) {
+                        iniciarMusicaDeFondo();
+                    }
+                };
+                window.addEventListener('click', unlockAudio, { once: true });
+                window.addEventListener('touchstart', unlockAudio, { once: true });
+            });
+        }
+
+        // Pasar automáticamente a la siguiente canción de fondo si la actual termina antes del minuto
+        bgAudio.addEventListener('ended', () => {
+            if (bgManualStopped || isPlayingLive || isPlayingEpisode || bgPlaylist.length === 0) return;
+            bgTrackIndex = (bgTrackIndex + 1) % bgPlaylist.length;
+            bgAudio.src = bgPlaylist[bgTrackIndex];
+            bgAudio.play().catch(() => {});
+        });
+
+        function detenerMusicaDeFondo(suave = false) {
+            bgManualStopped = true;
+            if (bgStopTimeout) {
+                clearTimeout(bgStopTimeout);
+                bgStopTimeout = null;
+            }
+
+            if (bgAudio.paused) return;
+
+            if (!suave) {
+                bgAudio.pause();
+                bgAudio.currentTime = 0;
+                return;
+            }
+
+            let fadeTimer = setInterval(() => {
+                if (bgAudio.volume > 0.05) {
+                    bgAudio.volume = Math.max(0, bgAudio.volume - 0.08);
+                } else {
+                    bgAudio.pause();
+                    bgAudio.currentTime = 0;
+                    bgAudio.volume = 0.5;
+                    clearInterval(fadeTimer);
+                }
+            }, 60);
+        }
+
         window.addEventListener('load', () => {
             updateDynamicSchedule();
             checkLiveAvailability();
@@ -727,32 +796,11 @@
                 updateDynamicSchedule();
                 checkLiveAvailability();
             }, 60000);
-
-            bgAudio.volume = 0.5;
-            bgAudio.play().catch(() => {
-                const unlockAudio = () => {
-                    if (!isPlayingLive && !isPlayingEpisode && bgAudio.paused) {
-                        bgAudio.play();
-                    }
-                    window.removeEventListener('click', unlockAudio);
-                };
-                window.addEventListener('click', unlockAudio);
-            });
         });
 
-        function fadeOutBackground() {
-            let fadeTimer = setInterval(() => {
-                if (bgAudio.volume > 0.05) {
-                    bgAudio.volume -= 0.1; 
-                } else {
-                    bgAudio.pause();
-                    bgAudio.volume = 0.5; 
-                    clearInterval(fadeTimer);
-                }
-            }, 50); 
-        }
-
         playTrigger.addEventListener('click', () => {
+            detenerMusicaDeFondo(false);
+
             if (!isLiveAllowed && !isPlayingLive) {
                 alert("El programa 'Rincón Gaitero' solo está disponible en vivo en su horario programado.");
                 return;
@@ -764,8 +812,6 @@
                     isPlayingEpisode = false;
                     episodeIcon.className = "fa-solid fa-play";
                 }
-
-                if (!bgAudio.paused) fadeOutBackground();
 
                 audioStream.play().then(() => {
                     isPlayingLive = true;
@@ -786,13 +832,13 @@
             return 'image';
         }
 
-        function resolveGifPath(item) {
+        function resolvePathWithFolder(item, defaultFolder) {
             const raw = typeof item === 'string' ? item : (item && item.file ? item.file : '');
             if (!raw) return '';
-            return raw.includes('/') ? raw : `gifs/${raw}`;
+            return raw.includes('/') ? raw : `${defaultFolder}/${raw}`;
         }
 
-        // Lectura unificada de lista.json (episodios, canciones y gifs)
+        // Lectura unificada de lista.json (episodios, canciones, gifs y fondo)
         async function cargarContenidoDesdeListaJson() {
             availableEpisodes = [];
             episodeSelect.innerHTML = '<option value="" disabled selected>🎧 Cargando contenidos...</option>';
@@ -829,9 +875,19 @@
                 const gifItems = Array.isArray(data.gifs) ? data.gifs : [];
                 renderizarCirculoMedia(gifItems);
 
+                // 3. Cargar pistas de música de fondo desde carpeta /audio/
+                const fondoItems = Array.isArray(data.fondo) && data.fondo.length > 0
+                    ? data.fondo.map(f => resolvePathWithFolder(f, 'audio')).filter(Boolean)
+                    : ['audio/musica_fondo.mp3'];
+
+                bgPlaylist = fondoItems;
+                iniciarMusicaDeFondo();
+
             } catch (error) {
                 console.error("Error leyendo lista.json:", error);
                 episodeSelect.innerHTML = '<option value="">No hay audios disponibles</option>';
+                bgPlaylist = ['audio/musica_fondo.mp3'];
+                iniciarMusicaDeFondo();
             }
         }
 
@@ -840,7 +896,7 @@
             container.innerHTML = '';
             container.classList.remove('has-rotation');
 
-            const paths = gifItems.map(resolveGifPath).filter(Boolean);
+            const paths = gifItems.map(item => resolvePathWithFolder(item, 'gifs')).filter(Boolean);
             if (paths.length === 0) return;
 
             paths.forEach((path, i) => {
@@ -893,10 +949,12 @@
             }, 3000);
         }
 
-        // Cambio de canción en el selector con reinicio limpio y reproducción inmediata
+        // Cambio de canción en el selector
         episodeSelect.addEventListener('change', (e) => {
             const nuevaRuta = e.target.value;
             if (!nuevaRuta) return;
+
+            detenerMusicaDeFondo(false);
 
             episodeStream.pause();
             progressBar.value = 0;
@@ -914,8 +972,6 @@
                 statusLabel.innerText = isLiveAllowed ? "TOCA PARA ESCUCHAR" : "FUERA DE AIRE";
             }
 
-            if (!bgAudio.paused) fadeOutBackground();
-
             episodeIcon.className = "fa-solid fa-spinner fa-spin";
             episodeStream.play().then(() => {
                 isPlayingEpisode = true;
@@ -929,6 +985,8 @@
 
         // Botón Play / Stop
         episodePlayBtn.addEventListener('click', () => {
+            detenerMusicaDeFondo(false);
+
             if (!episodeStream.src) return;
 
             if (!isPlayingEpisode) {
@@ -938,8 +996,6 @@
                     playIcon.className = "fa-solid fa-play";
                     statusLabel.innerText = isLiveAllowed ? "TOCA PARA ESCUCHAR" : "FUERA DE AIRE";
                 }
-
-                if (!bgAudio.paused) fadeOutBackground();
 
                 episodeIcon.className = "fa-solid fa-spinner fa-spin";
                 episodeStream.play().then(() => {
