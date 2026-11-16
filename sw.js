@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rincon-gaitero-v3';
+const CACHE_NAME = 'rincon-gaitero-v4';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
@@ -17,19 +17,19 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // 1. Dejar pasar directo a la red los audios, videos y peticiones por rangos (Range)
-  // Esto evita que el cambio de canciones o los videos .mp4 se queden cargando
+  // Dejar pasar directo a la red los audios, videos y peticiones por rangos (Range)
   if (
     event.request.headers.get('range') ||
     url.pathname.includes('/canciones/') ||
     url.pathname.includes('/episodios/') ||
     url.pathname.includes('/gifs/') ||
+    url.pathname.includes('/audio/') ||
     url.pathname.match(/\.(mp3|ogg|wav|m4a|mp4|webm)$/i)
   ) {
     return;
   }
 
-  // 2. Para el resto de la web (HTML, CSS, JS, JSON, Logos): red primero y respaldo en caché
+  // Para el resto de la web (HTML, CSS, JS, JSON, Logos): red primero y respaldo en caché
   event.respondWith(
     fetch(event.request)
       .then((response) => {
