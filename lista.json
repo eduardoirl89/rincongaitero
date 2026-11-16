@@ -1,6 +1,9 @@
 {
     "episodios":  [
-
+                    {
+                        "file":  "episodios/a_lo_zuliano_linda_guajirita.mp3",
+                        "name":  "A Lo Zuliano Linda Guajirita"
+                      }
                   ],
     "canciones":  [
                       {
