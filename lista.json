@@ -1396,7 +1396,7 @@
                  "gifs/gif1.mp4"
               ]
     "fondo": [
-    "audio/musica_fondo_1.mp3",
-    "audio/musica_fondo_2.mp3"
+    "audio/musica_fondo1.mp3",
+    "audio/musica_fondo2.mp3"
   ]
 }
