@@ -516,6 +516,22 @@
             color: #fff;
             font-size: 1rem;
         }
+
+        /* 7. RIF discreto en el pie */
+        .rif-footer {
+            position: absolute;
+            bottom: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.56rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.42);
+            text-transform: uppercase;
+            white-space: nowrap;
+            z-index: 10;
+            pointer-events: none;
+        }
     </style>
 
     <!-- Enlace para activar PWA (Instalación de acceso directo) -->
@@ -618,6 +634,9 @@
                     <i class="fa-brands fa-whatsapp"></i>
                 </a>
             </div>
+
+            <!-- 7. RIF -->
+            <div class="rif-footer" id="uiRifText">RIF: J-00000000-0</div>
         </div>
     </div>
 
@@ -634,6 +653,11 @@
 
             document.getElementById('radioStream').src = CONFIG.urlStreamRadio;
             document.getElementById('uiWhatsappLink').href = `https://wa.me/${CONFIG.whatsappNumero}?text=${CONFIG.whatsappMensaje}`;
+
+            if (CONFIG.rif) {
+                const rifFormatted = CONFIG.rif.toUpperCase().startsWith('RIF') ? CONFIG.rif : `RIF: ${CONFIG.rif}`;
+                document.getElementById('uiRifText').innerText = rifFormatted;
+            }
         }
 
         const bgAudio = document.getElementById('backgroundAudio');
@@ -732,15 +756,13 @@
             bgAudio.load();
 
             bgAudio.play().then(() => {
-                // Detener automáticamente al cumplirse 1 minuto (60,000 ms)
                 if (!bgStopTimeout) {
                     bgStopTimeout = setTimeout(() => {
                         detenerMusicaDeFondo(true);
                     }, 60000);
                 }
             }).catch(() => {
-                // Si el navegador bloquea el autoplay inicial, arranca con la primera interacción del usuario
-                const unlockAudio = (e) => {
+                const unlockAudio = () => {
                     window.removeEventListener('click', unlockAudio);
                     window.removeEventListener('touchstart', unlockAudio);
                     if (!bgManualStopped && !isPlayingLive && !isPlayingEpisode && bgAudio.paused) {
@@ -752,7 +774,6 @@
             });
         }
 
-        // Pasar automáticamente a la siguiente canción de fondo si la actual termina antes del minuto
         bgAudio.addEventListener('ended', () => {
             if (bgManualStopped || isPlayingLive || isPlayingEpisode || bgPlaylist.length === 0) return;
             bgTrackIndex = (bgTrackIndex + 1) % bgPlaylist.length;
@@ -838,7 +859,6 @@
             return raw.includes('/') ? raw : `${defaultFolder}/${raw}`;
         }
 
-        // Lectura unificada de lista.json (episodios, canciones, gifs y fondo)
         async function cargarContenidoDesdeListaJson() {
             availableEpisodes = [];
             episodeSelect.innerHTML = '<option value="" disabled selected>🎧 Cargando contenidos...</option>';
@@ -849,7 +869,6 @@
                 
                 const data = await response.json();
 
-                // 1. Cargar audios (episodios y canciones)
                 if (Array.isArray(data.episodios)) data.episodios.forEach(ep => availableEpisodes.push(ep));
                 if (Array.isArray(data.canciones)) data.canciones.forEach(c => availableEpisodes.push(c));
 
@@ -871,11 +890,9 @@
                     episodeContainerBlock.style.display = "none";
                 }
 
-                // 2. Cargar círculo de GIFs / videos / imágenes
                 const gifItems = Array.isArray(data.gifs) ? data.gifs : [];
                 renderizarCirculoMedia(gifItems);
 
-                // 3. Cargar pistas de música de fondo desde carpeta /audio/
                 const fondoItems = Array.isArray(data.fondo) && data.fondo.length > 0
                     ? data.fondo.map(f => resolvePathWithFolder(f, 'audio')).filter(Boolean)
                     : ['audio/musica_fondo.mp3'];
@@ -949,7 +966,6 @@
             }, 3000);
         }
 
-        // Cambio de canción en el selector
         episodeSelect.addEventListener('change', (e) => {
             const nuevaRuta = e.target.value;
             if (!nuevaRuta) return;
@@ -983,7 +999,6 @@
             });
         });
 
-        // Botón Play / Stop
         episodePlayBtn.addEventListener('click', () => {
             detenerMusicaDeFondo(false);
 
