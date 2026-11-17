@@ -1,0 +1,20 @@
+{
+  "episodios": [],
+  "canciones": [
+    {
+      "name": "",
+      "file": "canciones/"
+    },
+    {
+      "name": "Sentir Zuliano",
+      "file": "canciones/sentir_zuliano.mp3"
+    }
+  ],
+  "gifs": [
+    "gifs/gif1.mp4"
+  ],
+  "fondo": [
+    "audio/musica_fondo1.mp3",
+    "audio/musica_fondo_2.mp3"
+  ]
+}
