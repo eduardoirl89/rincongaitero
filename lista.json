@@ -1,11 +1,10 @@
 {
   "episodios": [
-{
+    {
       "name": "Episodio Muestra",
       "file": "episodios/episodio1.mp3"
     }
-
-],
+  ],
   "canciones": [
     {
       "name": "Gran Coquivacoa - El vive",
@@ -13,9 +12,9 @@
     },
     {
       "name": "Iluminación Gaitera - Vieja y sabrosa",
-      "file": "canciones/iluminacion_gaitera_vieja_y_sabrosa.mp3 "
+      "file": "canciones/iluminacion_gaitera_vieja_y_sabrosa.mp3"
     },
-        {
+    {
       "name": "Colosales - Barrio de mis andanzas",
       "file": "canciones/colosales_barrio_de_mis_andanzas.mp3"
     }
@@ -24,7 +23,9 @@
     "gifs/gif1.mp4"
   ],
   "fondo": [
-    "audio/musica_fondo1.mp3",
-    "audio/musica_fondo_2.mp3"
+    "audio/musica_fondo1.mp3"
+  ],
+  "fondo_aire": [
+    "audio/musica_fondo2.mp3"
   ]
 }
