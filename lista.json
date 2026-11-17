@@ -1,5 +1,11 @@
 {
-  "episodios": [],
+  "episodios": [
+{
+      "name": "Episodio Muestra",
+      "file": "episodios/episodios1.mp3"
+    }
+
+],
   "canciones": [
     {
       "name": "",
