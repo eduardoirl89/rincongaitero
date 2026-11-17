@@ -2,7 +2,7 @@
 const CONFIG = {
     nombrePrograma: "RINCON GAITERO",
     conductor: "con Eduardo Rincón",
-    
+    rif: "V-00000000-0",
     // Configuración del Horario del Programa En Vivo, Hora Militar:
    // Días múltiples de transmisión (Ej: Martes [2] y Jueves [4]: [2, 4])
     diasPrograma: [0], 
