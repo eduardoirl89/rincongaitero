@@ -2,7 +2,7 @@
   "episodios": [
 {
       "name": "Episodio Muestra",
-      "file": "episodios/episodios1.mp3"
+      "file": "episodios/episodio1.mp3"
     }
 
 ],
@@ -12,7 +12,7 @@
       "file": "canciones/"
     },
     {
-      "name": "Iliminación Gaitera - Vieja y sabrosa",
+      "name": "Iluminación Gaitera - Vieja y sabrosa",
       "file": "canciones/iluminacion_gaitera_vieja_y_sabrosa.mp3 "
     }
   ],
