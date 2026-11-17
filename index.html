@@ -554,6 +554,7 @@
 
     <!-- Audios -->
     <audio id="backgroundAudio" preload="auto"></audio>
+    <audio id="airBackgroundAudio" preload="auto"></audio>
     <audio id="radioStream" preload="none"></audio>
     <audio id="episodeStream" preload="metadata"></audio>
 
@@ -635,8 +636,8 @@
                 </a>
             </div>
 
-            <!-- 7. RIF -->
-            <div class="rif-footer" id="uiRifText">RIF: J-00000000-0</div>
+            <!-- 7. RIF (inyectado desde config.js) -->
+            <div class="rif-footer" id="uiRifText" style="display: none;"></div>
         </div>
     </div>
 
@@ -654,13 +655,17 @@
             document.getElementById('radioStream').src = CONFIG.urlStreamRadio;
             document.getElementById('uiWhatsappLink').href = `https://wa.me/${CONFIG.whatsappNumero}?text=${CONFIG.whatsappMensaje}`;
 
-            if (CONFIG.rif) {
-                const rifFormatted = CONFIG.rif.toUpperCase().startsWith('RIF') ? CONFIG.rif : `RIF: ${CONFIG.rif}`;
-                document.getElementById('uiRifText').innerText = rifFormatted;
+            const rifValor = CONFIG.rif || CONFIG.RIF || CONFIG.rifPrograma || '';
+            const rifEl = document.getElementById('uiRifText');
+            if (String(rifValor).trim() !== '') {
+                const limpio = String(rifValor).trim();
+                rifEl.innerText = limpio.toUpperCase().startsWith('RIF') ? limpio : `RIF: ${limpio}`;
+                rifEl.style.display = 'block';
             }
         }
 
         const bgAudio = document.getElementById('backgroundAudio');
+        const airBgAudio = document.getElementById('airBackgroundAudio');
         const audioStream = document.getElementById('radioStream');
         const episodeStream = document.getElementById('episodeStream');
         
@@ -681,11 +686,15 @@
         let isLiveAllowed = false;
         let availableEpisodes = [];
 
-        // Control de música de fondo (lista dinámica + límite de 1 minuto)
+        // Control de música de fondo general ("fondo") + límite de 1 minuto
         let bgPlaylist = [];
         let bgTrackIndex = 0;
         let bgStopTimeout = null;
         let bgManualStopped = false;
+
+        // Control de música de fondo cuando el programa está al aire ("fondo_aire")
+        let airBgPlaylist = [];
+        let airBgTrackIndex = 0;
 
         function checkLiveAvailability() {
             if (typeof CONFIG === 'undefined') return;
@@ -706,6 +715,8 @@
                     statusLabel.innerText = "FUERA DE AIRE";
                 }
             }
+
+            actualizarFondoSegunAire();
         }
 
         function updateDynamicSchedule() {
@@ -808,6 +819,40 @@
             }, 60);
         }
 
+        // Reproduce las pistas de "fondo_aire" solo cuando el programa está al aire
+        function actualizarFondoSegunAire() {
+            if (!isLiveAllowed || isPlayingLive || isPlayingEpisode || airBgPlaylist.length === 0) {
+                if (!airBgAudio.paused) {
+                    airBgAudio.pause();
+                }
+                return;
+            }
+
+            if (!airBgAudio.src || !airBgAudio.src.endsWith(airBgPlaylist[airBgTrackIndex])) {
+                airBgAudio.src = airBgPlaylist[airBgTrackIndex];
+                airBgAudio.volume = 0.45;
+                airBgAudio.load();
+            }
+
+            if (airBgAudio.paused) {
+                airBgAudio.play().catch(() => {});
+            }
+        }
+
+        airBgAudio.addEventListener('ended', () => {
+            if (!isLiveAllowed || isPlayingLive || isPlayingEpisode || airBgPlaylist.length === 0) return;
+            airBgTrackIndex = (airBgTrackIndex + 1) % airBgPlaylist.length;
+            airBgAudio.src = airBgPlaylist[airBgTrackIndex];
+            airBgAudio.play().catch(() => {});
+        });
+
+        function detenerFondoAire() {
+            if (!airBgAudio.paused) {
+                airBgAudio.pause();
+                airBgAudio.currentTime = 0;
+            }
+        }
+
         window.addEventListener('load', () => {
             updateDynamicSchedule();
             checkLiveAvailability();
@@ -821,6 +866,7 @@
 
         playTrigger.addEventListener('click', () => {
             detenerMusicaDeFondo(false);
+            detenerFondoAire();
 
             if (!isLiveAllowed && !isPlayingLive) {
                 alert("El programa 'Rincón Gaitero' solo está disponible en vivo en su horario programado.");
@@ -844,6 +890,7 @@
                 isPlayingLive = false;
                 playIcon.className = "fa-solid fa-play"; 
                 statusLabel.innerText = isLiveAllowed ? "TOCA PARA ESCUCHAR" : "FUERA DE AIRE";
+                actualizarFondoSegunAire();
             }
         });
 
@@ -854,7 +901,7 @@
         }
 
         function resolvePathWithFolder(item, defaultFolder) {
-            const raw = typeof item === 'string' ? item : (item && item.file ? item.file : '');
+            const raw = typeof item === 'string' ? item.trim() : (item && item.file ? String(item.file).trim() : '');
             if (!raw) return '';
             return raw.includes('/') ? raw : `${defaultFolder}/${raw}`;
         }
@@ -878,12 +925,12 @@
                     
                     availableEpisodes.forEach(ep => {
                         const option = document.createElement('option');
-                        option.value = ep.file;
+                        option.value = String(ep.file).trim();
                         option.textContent = ep.name;
                         episodeSelect.appendChild(option);
                     });
 
-                    episodeStream.src = availableEpisodes[0].file;
+                    episodeStream.src = String(availableEpisodes[0].file).trim();
                     episodeStream.preload = "metadata";
                     episodeStream.load();
                 } else {
@@ -897,8 +944,13 @@
                     ? data.fondo.map(f => resolvePathWithFolder(f, 'audio')).filter(Boolean)
                     : ['audio/musica_fondo.mp3'];
 
+                airBgPlaylist = Array.isArray(data.fondo_aire)
+                    ? data.fondo_aire.map(f => resolvePathWithFolder(f, 'audio')).filter(Boolean)
+                    : [];
+
                 bgPlaylist = fondoItems;
                 iniciarMusicaDeFondo();
+                actualizarFondoSegunAire();
 
             } catch (error) {
                 console.error("Error leyendo lista.json:", error);
@@ -971,6 +1023,7 @@
             if (!nuevaRuta) return;
 
             detenerMusicaDeFondo(false);
+            detenerFondoAire();
 
             episodeStream.pause();
             progressBar.value = 0;
@@ -1001,6 +1054,7 @@
 
         episodePlayBtn.addEventListener('click', () => {
             detenerMusicaDeFondo(false);
+            detenerFondoAire();
 
             if (!episodeStream.src) return;
 
@@ -1025,12 +1079,14 @@
                 episodeStream.pause();
                 isPlayingEpisode = false;
                 episodeIcon.className = "fa-solid fa-play";
+                actualizarFondoSegunAire();
             }
         });
 
         episodeStream.addEventListener('ended', () => {
             isPlayingEpisode = false;
             episodeIcon.className = "fa-solid fa-play";
+            actualizarFondoSegunAire();
         });
 
         episodeStream.addEventListener('loadedmetadata', () => {
